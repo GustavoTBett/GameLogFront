@@ -23,9 +23,9 @@ export const GlobalStyles = createGlobalStyle`
 
   body {
     background: ${({ theme }) => theme.colors.background};
-    color: ${({ theme }) => theme.colors.text};
+    color: ${({ theme }) => theme.colors.foreground};
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    font-size: ${({ theme }) => theme.fontSizes.text};
+    font-size: ${({ theme }) => theme.fontSizes[12]};
     line-height: ${({ theme }) => theme.lineHeights.normal};
     font-weight: ${({ theme }) => theme.fontWeights.regular};
     min-height: 100vh;
@@ -33,7 +33,7 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: ${({ theme }) => theme.colors.text};
+    color: ${({ theme }) => theme.colors.foreground};
     font-weight: ${({ theme }) => theme.fontWeights.bold};
     line-height: ${({ theme }) => theme.lineHeights.tight};
   }
