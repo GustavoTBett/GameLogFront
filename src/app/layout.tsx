@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import StyleRegistry from "@/lib/StyleRegistry";
 
-import { AppThemeProvider } from "@/contexts/ThemeProvider";
+import { AppThemeProvider } from "@/lib/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "teste",
