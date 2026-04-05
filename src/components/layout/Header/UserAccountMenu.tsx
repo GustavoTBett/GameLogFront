@@ -1,6 +1,10 @@
+"use client"
+
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { User, Heart, Sparkles, LogOut } from "lucide-react"
 import * as S from "./Header.styled"
+import { useAuth } from "@/hooks/useAuth"
 import { ThemeToggle } from "@/components/features/ThemeToggle/ThemeToggle"
 import {
   DropdownMenu,
@@ -9,9 +13,45 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/features/Dropdown/DropdownMenu"
+import styled from "styled-components"
 
-export function UserAccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
-  if (!isLoggedIn) {
+const LogoutButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => (theme as any).spacing[8]};
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => (theme as any).colors.destructive};
+  font-size: ${({ theme }) => (theme as any).fontSizes[14]};
+  padding: 0;
+  transition: all 0.2s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export function UserAccountMenu() {
+  const router = useRouter()
+  const { isAuthenticated, user, logout, isLoading } = useAuth()
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      router.push("/")
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error)
+    }
+  }
+
+  if (!isAuthenticated || !user) {
     return (
       <S.UserActions>
         <ThemeToggle />
@@ -36,6 +76,10 @@ export function UserAccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
           </S.ActionButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <div className="px-2 py-1.5 text-sm font-medium text-foreground">
+            {user.username}
+          </div>
+          <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <S.MenuLink href="/perfil"><User size={16} /> Meu Perfil</S.MenuLink>
           </DropdownMenuItem>
@@ -47,7 +91,9 @@ export function UserAccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <S.MenuLink href="/login" $danger><LogOut size={16} /> Sair</S.MenuLink>
+            <LogoutButton onClick={handleLogout} disabled={isLoading}>
+              <LogOut size={16} /> Sair
+            </LogoutButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

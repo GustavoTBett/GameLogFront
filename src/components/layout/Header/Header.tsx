@@ -3,13 +3,15 @@
 import { useState } from "react"
 import { Menu, X, Gamepad2 } from "lucide-react"
 import * as S from "./Header.styled"
+import { useAuth } from "@/hooks/useAuth"
 
 import { NavLinks } from "./NavLinks"
 import { SearchForm } from "./SearchForm"
 import { UserAccountMenu } from "./UserAccountMenu"
 
-export function Header({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
+export function Header() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
 
   return (
     <S.Nav>
@@ -17,7 +19,7 @@ export function Header({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
         <S.NavContent>
           <S.LogoLink href="/" onClick={() => setIsMobileOpen(false)}>
             <Gamepad2 size={32} />
-            <span>GameVault</span>
+            <span>GameLog</span>
           </S.LogoLink>
 
           <S.DesktopNav>
@@ -26,7 +28,7 @@ export function Header({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
 
           <SearchForm />
 
-          <UserAccountMenu isLoggedIn={isLoggedIn} />
+          <UserAccountMenu />
 
           <S.MobileMenuButton onClick={() => setIsMobileOpen(!isMobileOpen)}>
             {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -39,8 +41,7 @@ export function Header({ isLoggedIn = false }: { isLoggedIn?: boolean }) {
               <SearchForm isMobile />
               
               <NavLinks 
-                isMobile 
-                isLoggedIn={isLoggedIn} 
+                isMobile
                 onClose={() => setIsMobileOpen(false)} 
               />
             </S.MobileNavList>

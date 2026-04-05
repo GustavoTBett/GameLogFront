@@ -6,7 +6,7 @@ import { Header } from "@/components/layout/Header/Header";
 export default function HomeClient() {
   return (
     <>
-    <Header isLoggedIn={true} />
+    <Header />
     <div>
       <h1>Página Inicial</h1>
       <p>Teste de renderização com Styled Components</p>
