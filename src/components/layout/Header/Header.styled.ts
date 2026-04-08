@@ -80,11 +80,11 @@ export const NavItem = styled(Link)<{ $isActive?: boolean; $isMobile?: boolean; 
   border-radius: ${({ $isMobile, theme }) => $isMobile ? theme.spacing[8] : '0'};
 
   background-color: ${({ $isActive, $isMobile, theme }) => 
-    ($isActive && $isMobile) ? `${theme.brand.green}15` : 'transparent'};
+    ($isActive && $isMobile) ? `${theme.colors.primary}15` : 'transparent'};
 
   color: ${({ $isActive, $danger, theme }) => {
     if ($danger) return theme.colors.destructive;
-    return $isActive ? theme.brand.green : theme.colors.mutedForeground;
+    return $isActive ? theme.colors.primary : theme.colors.mutedForeground;
   }};
 
   &:hover {
@@ -222,7 +222,7 @@ export const ActionButton = styled.button<{ $variant?: 'ghost' | 'primary' }>`
       $variant === 'ghost' ? theme.colors.secondary : theme.colors.primary};
       
     color: ${({ $variant, theme }) => 
-      $variant === 'ghost' ? theme.brand.green : theme.colors.primaryForeground};
+      $variant === 'ghost' ? theme.colors.primary : theme.colors.primaryForeground};
       
     filter: ${({ $variant }) => 
       $variant === 'primary' ? 'brightness(0.9)' : 'none'};
