@@ -1,14 +1,14 @@
 import Link from "next/link"
 import { User, Heart, Sparkles, LogOut } from "lucide-react"
 import * as S from "./Header.styled"
-import { ThemeToggle } from "@/components/features/ThemeToggle/ThemeToggle"
+import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/features/Dropdown/DropdownMenu"
+} from "@/components/ui/dropdown/DropdownMenu"
 
 export function UserAccountMenu({ isLoggedIn }: { isLoggedIn: boolean }) {
   if (!isLoggedIn) {
