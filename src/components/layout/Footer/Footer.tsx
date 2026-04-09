@@ -10,7 +10,7 @@ export function Footer() {
         <S.Content>
           <S.LogoContainer>
             <Gamepad2 />
-            <span>GameVault</span>
+            <span>GameLog</span>
           </S.LogoContainer>
           
           <S.Description>
