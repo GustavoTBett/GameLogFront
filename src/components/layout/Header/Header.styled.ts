@@ -1,14 +1,25 @@
 import styled from 'styled-components'
 import Link from 'next/link'
+import { saturate, desaturate } from 'polished';
 
-export const Nav = styled.nav`
-  position: sticky;
+export const Nav = styled.nav<{ $isOpen?: boolean }>`
+  ${({$isOpen }) => !$isOpen && `
+     position: sticky;
+  `}
   top: 0;
   z-index: 50;
   width: 100%;
   border-bottom: 1px solid ${({ theme }) => theme.colors.border};
   background-color: ${({ theme }) => theme.colors.background}F2;
   backdrop-filter: blur(8px);
+
+  ${({ theme, $isOpen }) => $isOpen && `
+     position: absolute;
+     
+     ${theme.media.tablet} {
+       position: sticky;
+     }
+  `}
 `
 
 export const Container = styled.div`
@@ -84,13 +95,26 @@ export const NavItem = styled(Link)<{ $isActive?: boolean; $isMobile?: boolean; 
 
   color: ${({ $isActive, $danger, theme }) => {
     if ($danger) return theme.colors.destructive;
-    return $isActive ? theme.colors.primary : theme.colors.mutedForeground;
+    
+    if ($isActive) {
+      return desaturate(0.3, theme.colors.primary);
+    }
+    
+    return theme.colors.mutedForeground;
   }};
 
-  &:hover {
+    &:hover {
     background-color: ${({ $isMobile, theme }) => $isMobile ? theme.colors.secondary : 'transparent'};
-    color: ${({ theme, $danger }) => $danger ? theme.colors.destructive : theme.colors.foreground};
+    
+    color: ${({ theme, $danger }) => {
+      if ($danger) return theme.colors.destructive;
+      
+      return saturate(0.2, theme.colors.primary);
+    }};
+
+    filter: brightness(1.1);
   }
+    
 `;
 
 export const MenuLink = styled(Link)<{ $danger?: boolean }>`
@@ -199,7 +223,7 @@ export const MobileNavList = styled.div`
   gap: ${({ theme }) => theme.spacing[8]};
 `
 
-export const ActionButton = styled.button<{ $variant?: 'ghost' | 'primary' }>`
+export const ActionButton = styled.button<{ $variant?: 'ghost' | 'primary'; $loggedOut?: boolean }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -208,8 +232,12 @@ export const ActionButton = styled.button<{ $variant?: 'ghost' | 'primary' }>`
   font-size: ${({ theme }) => theme.fontSizes[14]};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   cursor: pointer;
-  border: none;
+  border: 2px solid transparent;
   transition: all 0.2s;
+
+  ${({ $loggedOut }) => $loggedOut && `
+    border-radius: ${$loggedOut ? '0.375rem' : '50%'};
+  `}
 
   background-color: ${({ $variant, theme }) => 
     $variant === 'ghost' ? 'transparent' : theme.colors.primary};
@@ -219,12 +247,63 @@ export const ActionButton = styled.button<{ $variant?: 'ghost' | 'primary' }>`
 
   &:hover {
     background-color: ${({ $variant, theme }) => 
-      $variant === 'ghost' ? theme.colors.secondary : theme.colors.primary};
-      
+      $variant === 'ghost' ? 'transparent' : theme.colors.primary};
+
+    border-color: ${({ theme }) => theme.colors.primary};
+
     color: ${({ $variant, theme }) => 
       $variant === 'ghost' ? theme.colors.primary : theme.colors.primaryForeground};
-      
-    filter: ${({ $variant }) => 
-      $variant === 'primary' ? 'brightness(0.9)' : 'none'};
   }
 `
+
+export const LogoutNavItem = styled.button`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing[8]};
+  font-size: ${({ theme }) => theme.fontSizes[14]};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  text-decoration: none;
+  transition: all 0.2s;
+  
+  padding: ${({ theme }) => `${theme.spacing[8]} ${theme.spacing[12]}`};
+  border-radius: ${({ theme }) => theme.spacing[8]};
+  
+  background-color: transparent;
+  color: ${({ theme }) => theme.colors.destructive};
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.destructive};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+
+export const LogoutButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing[8]};
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.destructive};
+  font-size: ${({ theme }) => theme.fontSizes[14]};
+  padding: 0;
+  transition: all 0.2s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;

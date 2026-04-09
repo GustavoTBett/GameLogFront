@@ -14,30 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown/DropdownMenu"
-import styled from "styled-components"
-
-const LogoutButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => (theme as any).spacing[8]};
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${({ theme }) => (theme as any).colors.destructive};
-  font-size: ${({ theme }) => (theme as any).fontSizes[14]};
-  padding: 0;
-  transition: all 0.2s;
-  
-  &:hover {
-    opacity: 0.8;
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
 
 export function UserAccountMenu() {
   const router = useRouter()
@@ -56,8 +32,8 @@ export function UserAccountMenu() {
     return (
       <S.UserActions>
         <ThemeToggle />
-        <Link href="/login"><S.ActionButton $variant="ghost">Entrar</S.ActionButton></Link>
-        <Link href="/register"><S.ActionButton $variant="primary">Cadastrar</S.ActionButton></Link>
+        <Link href="/login"><S.ActionButton $variant="ghost" $loggedOut>Entrar</S.ActionButton></Link>
+        <Link href="/register"><S.ActionButton $variant="primary" $loggedOut>Cadastrar</S.ActionButton></Link>
       </S.UserActions>
     )
   }
@@ -92,9 +68,9 @@ export function UserAccountMenu() {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <LogoutButton onClick={handleLogout} disabled={isLoading}>
+            <S.LogoutButton onClick={handleLogout} disabled={isLoading}>
               <LogOut size={16} /> Sair
-            </LogoutButton>
+            </S.LogoutButton>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

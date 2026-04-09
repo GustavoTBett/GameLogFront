@@ -14,7 +14,7 @@ export function Header() {
   const { isAuthenticated } = useAuth()
 
   return (
-    <S.Nav>
+    <S.Nav $isOpen={isMobileOpen}>
       <S.Container>
         <S.NavContent>
           <S.LogoLink href="/" onClick={() => setIsMobileOpen(false)}>
