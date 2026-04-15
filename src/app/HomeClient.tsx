@@ -42,6 +42,8 @@ const PLACEHOLDER_404 = (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     style={{ position: "absolute", inset: 0 }}
+    role="img"
+    aria-label="Imagem não encontrada"
   >
     <rect width="400" height="225" fill="#f0f0f0" />
     <text
