@@ -10,8 +10,9 @@ import {
   LoginRequest,
   ResetPasswordRequest,
 } from "@/types/auth";
+import { ExploreGamesFilters, GameSummary, GenreOption, PagedResponse } from "@/types/game";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 // Cache de token CSRF
 let csrfTokenCache: CsrfToken | null = null;
@@ -54,9 +55,9 @@ async function fetchAPI<T = unknown>(
   const method = options.method || "GET";
 
   // Preparar headers
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
+    ...(options.headers as Record<string, string> | undefined),
   };
 
   // Adicionar CSRF token para requisições não-GET
@@ -185,6 +186,49 @@ export const authAPI = {
     });
 
     csrfTokenCache = null;
+    return data;
+  },
+};
+
+export const gamesAPI = {
+  explore: async (
+    params: ExploreGamesFilters & { page?: number; size?: number }
+  ): Promise<PagedResponse<GameSummary>> => {
+    const searchParams = new URLSearchParams();
+
+    searchParams.set("page", String(params.page ?? 0));
+    searchParams.set("size", String(params.size ?? 12));
+
+    if (params.genreId) {
+      searchParams.set("genreId", String(params.genreId));
+    }
+
+    if (params.platform) {
+      searchParams.set("platform", params.platform);
+    }
+
+    if (typeof params.minRating === "number") {
+      searchParams.set("minRating", String(params.minRating));
+    }
+
+    const { data } = await fetchAPI<PagedResponse<GameSummary>>(`/games/explore?${searchParams.toString()}`);
+    return data;
+  },
+
+  getPopular: async (limit = 6): Promise<GameSummary[]> => {
+    const { data } = await fetchAPI<GameSummary[]>(`/games/popular?limit=${limit}`);
+    return data;
+  },
+
+  getTopRated: async (limit = 6): Promise<GameSummary[]> => {
+    const { data } = await fetchAPI<GameSummary[]>(`/games/top-rated?limit=${limit}`);
+    return data;
+  },
+};
+
+export const genresAPI = {
+  getAll: async (): Promise<GenreOption[]> => {
+    const { data } = await fetchAPI<GenreOption[]>("/genres");
     return data;
   },
 };

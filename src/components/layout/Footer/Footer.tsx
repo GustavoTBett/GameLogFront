@@ -16,6 +16,9 @@ export function Footer() {
           <S.Description>
             Projeto educacional de review de jogos
           </S.Description>
+          <S.Description>
+            Imagens e dados externos podem ser provenientes de RAWG e VGChartz. Arte de capa do VGChartz.
+          </S.Description>
         </S.Content>
       </S.Container>
     </S.FooterWrapper>
