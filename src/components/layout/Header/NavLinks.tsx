@@ -4,7 +4,10 @@ import { usePathname, useRouter } from "next/navigation"
 import { Heart, User, LogOut } from "lucide-react"
 import * as S from "./Header.styled"
 import { useAuth } from "@/hooks/useAuth"
-import styled from "styled-components"
+import styled, { type DefaultTheme } from "styled-components"
+
+const fromTheme = <T,>(selector: (theme: DefaultTheme) => T) =>
+  ({ theme }: { theme: DefaultTheme }) => selector(theme)
 
 const mainLinks = [
   { href: "/", label: "Início" },
@@ -15,23 +18,23 @@ const mainLinks = [
 const LogoutNavItem = styled.button`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => (theme as any).spacing[8]};
-  font-size: ${({ theme }) => (theme as any).fontSizes[14]};
-  font-weight: ${({ theme }) => (theme as any).fontWeights.medium};
+  gap: ${fromTheme((theme) => theme.spacing[8])};
+  font-size: ${fromTheme((theme) => theme.fontSizes[14])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.medium)};
   text-decoration: none;
   transition: all 0.2s;
   
-  padding: ${({ theme }) => `${(theme as any).spacing[8]} ${(theme as any).spacing[12]}`};
-  border-radius: ${({ theme }) => (theme as any).spacing[8]};
+  padding: ${fromTheme((theme) => `${theme.spacing[8]} ${theme.spacing[12]}`)};
+  border-radius: ${fromTheme((theme) => theme.spacing[8])};
   
   background-color: transparent;
-  color: ${({ theme }) => (theme as any).colors.destructive};
+  color: ${fromTheme((theme) => theme.colors.destructive)};
   border: none;
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ theme }) => (theme as any).colors.secondary};
-    color: ${({ theme }) => (theme as any).colors.destructive};
+    background-color: ${fromTheme((theme) => theme.colors.secondary)};
+    color: ${fromTheme((theme) => theme.colors.destructive)};
   }
 
   &:disabled {

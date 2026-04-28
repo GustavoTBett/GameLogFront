@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Gamepad2, Star, TrendingUp, Users } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { Footer } from "@/components/layout/Footer/Footer";
 import { Header } from "@/components/layout/Header/Header";
+import { GameCard } from "@/components/features/games/GameCard";
 import { genresAPI } from "@/lib/api";
 import { useExploreGames } from "@/hooks/useExploreGames";
-import { useHomeGames } from "@/hooks/useHomeGames";
-import { useAuth } from "@/hooks/useAuth";
-import { GameCard } from "@/components/features/games/GameCard";
 import { ExploreGamesFilters, GamePlatform, GenreOption } from "@/types/game";
-import * as S from "./HomeClient.styled";
+import * as S from "../HomeClient.styled";
 
 const PLATFORM_OPTIONS: Array<{ value: "" | GamePlatform; label: string }> = [
   { value: "", label: "Todas plataformas" },
@@ -24,12 +23,11 @@ const PLATFORM_OPTIONS: Array<{ value: "" | GamePlatform; label: string }> = [
   { value: "ARCADE", label: "Arcade" },
 ];
 
-const LIMIT_OPTIONS = [6, 12, 18, 24];
+const LIMIT_OPTIONS = [12, 18, 24];
 
-export default function HomeClient() {
-  const { isAuthenticated } = useAuth();
-  const { popularGames, topRatedGames, isLoading: isLoadingHome, error: homeError } = useHomeGames(6);
-
+export default function GamesPage() {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q")?.trim() ?? "";
   const [genres, setGenres] = useState<GenreOption[]>([]);
   const [genresError, setGenresError] = useState<string | null>(null);
 
@@ -38,6 +36,7 @@ export default function HomeClient() {
   const [genreId, setGenreId] = useState<string>("");
   const [platform, setPlatform] = useState<"" | GamePlatform>("");
   const [minRating, setMinRating] = useState<string>("");
+  const effectivePage = searchQuery ? 0 : page;
 
   const filters = useMemo<ExploreGamesFilters>(() => {
     const value: ExploreGamesFilters = {};
@@ -57,11 +56,32 @@ export default function HomeClient() {
     return value;
   }, [genreId, minRating, platform]);
 
-  const { games: exploreGames, meta, isLoading: isLoadingExplore, error: exploreError } = useExploreGames({
-    page,
+  const { games, meta, isLoading, error } = useExploreGames({
+    page: effectivePage,
     size,
     filters,
   });
+
+  const filteredGames = useMemo(() => {
+    if (!searchQuery) {
+      return games;
+    }
+
+    const normalizedQuery = searchQuery.toLowerCase();
+
+    return games.filter((game) => {
+      const searchableText = [
+        game.name,
+        game.description ?? "",
+        game.developer ?? "",
+        game.genres.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(normalizedQuery);
+    });
+  }, [games, searchQuery]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -87,121 +107,27 @@ export default function HomeClient() {
     };
   }, []);
 
-
   return (
     <S.Wrapper>
       <Header />
 
-      <S.HeroSection>
-        <S.HeroBackground />
-        <S.Container>
-          <S.HeroTitle>
-            Descubra, Avalie e Compartilhe <S.HeroAccent>Jogos</S.HeroAccent>
-          </S.HeroTitle>
-          <S.HeroDescription>
-            Sua plataforma para avaliar jogos, descobrir novos títulos e acompanhar os destaques da comunidade.
-          </S.HeroDescription>
-
-          <S.HeroActions>
-            <S.HeroButton href="/jogos">
-              Explorar Jogos
-              <ArrowRight size={18} />
-            </S.HeroButton>
-            {!isAuthenticated ? (
-              <S.HeroButton href="/register" $variant="outline">
-                Criar Conta
-              </S.HeroButton>
-            ) : null}
-          </S.HeroActions>
-
-          <S.StatsGrid>
-            <S.StatCard>
-              <Gamepad2 size={26} color="#16a34a" />
-              <S.StatValue>{meta?.totalElements ?? "-"}</S.StatValue>
-              <S.StatLabel>Jogos indexados</S.StatLabel>
-            </S.StatCard>
-            <S.StatCard>
-              <Users size={26} color="#16a34a" />
-              <S.StatValue>{popularGames.reduce((sum, game) => sum + game.totalReviews, 0)}</S.StatValue>
-              <S.StatLabel>Avaliações nas vitrines</S.StatLabel>
-            </S.StatCard>
-            <S.StatCard>
-              <Star size={26} color="#16a34a" />
-              <S.StatValue>
-                {topRatedGames.length
-                  ? (topRatedGames.reduce((sum, game) => sum + game.averageRating, 0) / topRatedGames.length).toFixed(1)
-                  : "-"}
-              </S.StatValue>
-              <S.StatLabel>Média dos destaques</S.StatLabel>
-            </S.StatCard>
-            <S.StatCard>
-              <TrendingUp size={26} color="#16a34a" />
-              <S.StatValue>{Math.max(meta?.totalPages ?? 0, 1)}</S.StatValue>
-              <S.StatLabel>Páginas para explorar</S.StatLabel>
-            </S.StatCard>
-          </S.StatsGrid>
-        </S.Container>
-      </S.HeroSection>
-
       <S.Section>
         <S.Container>
           <S.SectionHeader>
             <S.SectionTitleWrap>
-              <S.SectionTitle>Jogos Populares</S.SectionTitle>
-              <S.SectionSubtitle>Os mais avaliados pela comunidade</S.SectionSubtitle>
+              <S.SectionTitle>Jogos</S.SectionTitle>
+              <S.SectionSubtitle>
+                Navegue pelo catálogo e abra qualquer jogo pela URL baseada em slug.
+              </S.SectionSubtitle>
+              {searchQuery ? (
+                <S.SectionSubtitle>
+                  Resultado da busca por: <strong>{searchQuery}</strong>
+                </S.SectionSubtitle>
+              ) : null}
             </S.SectionTitleWrap>
-            <S.SectionLink href="/jogos">
-              Ver todos <ArrowRight size={16} />
+            <S.SectionLink href="/">
+              Voltar para a home <ArrowRight size={16} />
             </S.SectionLink>
-          </S.SectionHeader>
-
-          {homeError ? (
-            <S.ErrorState>{homeError}</S.ErrorState>
-          ) : isLoadingHome ? (
-            <S.EmptyState>Carregando jogos populares...</S.EmptyState>
-          ) : (
-            <S.CardsGridCompact>
-              {popularGames.map((game) => (
-                <GameCard key={game.id} game={game} href={`/jogos/${game.slug}`} />
-              ))}
-            </S.CardsGridCompact>
-          )}
-        </S.Container>
-      </S.Section>
-
-      <S.Section $muted>
-        <S.Container>
-          <S.SectionHeader>
-            <S.SectionTitleWrap>
-              <S.SectionTitle>Mais Bem Avaliados</S.SectionTitle>
-              <S.SectionSubtitle>Jogos com as maiores notas</S.SectionSubtitle>
-            </S.SectionTitleWrap>
-            <S.SectionLink href="/jogos">
-              Ver todos <ArrowRight size={16} />
-            </S.SectionLink>
-          </S.SectionHeader>
-
-          {homeError ? (
-            <S.ErrorState>{homeError}</S.ErrorState>
-          ) : isLoadingHome ? (
-            <S.EmptyState>Carregando jogos mais bem avaliados...</S.EmptyState>
-          ) : (
-            <S.CardsGridDefault>
-              {topRatedGames.slice(0, 3).map((game) => (
-                <GameCard key={game.id} game={game} href={`/jogos/${game.slug}`} />
-              ))}
-            </S.CardsGridDefault>
-          )}
-        </S.Container>
-      </S.Section>
-
-      <S.Section>
-        <S.Container>
-          <S.SectionHeader>
-            <S.SectionTitleWrap>
-              <S.SectionTitle>Explorar jogos</S.SectionTitle>
-              <S.SectionSubtitle>Pagine e filtre por gênero, plataforma e nota mínima</S.SectionSubtitle>
-            </S.SectionTitleWrap>
           </S.SectionHeader>
 
           <S.FiltersWrap>
@@ -270,16 +196,16 @@ export default function HomeClient() {
 
           {genresError ? <S.ErrorState>{genresError}</S.ErrorState> : null}
 
-          {exploreError ? (
-            <S.ErrorState>{exploreError}</S.ErrorState>
-          ) : isLoadingExplore ? (
+          {error ? (
+            <S.ErrorState>{error}</S.ErrorState>
+          ) : isLoading ? (
             <S.EmptyState>Carregando catálogo...</S.EmptyState>
-          ) : exploreGames.length === 0 ? (
+          ) : filteredGames.length === 0 ? (
             <S.EmptyState>Nenhum jogo encontrado com esses filtros.</S.EmptyState>
           ) : (
             <>
               <S.CardsGridDefault>
-                {exploreGames.map((game) => (
+                {filteredGames.map((game) => (
                   <GameCard key={game.id} game={game} href={`/jogos/${game.slug}`} />
                 ))}
               </S.CardsGridDefault>
@@ -296,11 +222,16 @@ export default function HomeClient() {
                 </span>
                 <S.PaginationButton
                   onClick={() => setPage((current) => current + 1)}
-                  disabled={!meta || meta.last}
+                  disabled={!meta || meta.last || Boolean(searchQuery)}
                 >
                   Próxima
                 </S.PaginationButton>
               </S.Pagination>
+              {searchQuery ? (
+                <S.SectionSubtitle>
+                  A paginação foi fixada na primeira página enquanto a busca por texto estiver ativa.
+                </S.SectionSubtitle>
+              ) : null}
             </>
           )}
         </S.Container>

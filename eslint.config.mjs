@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Prototype UI folder (out of production validation scope):
+    "frontUxUi/**",
   ]),
 ]);
 

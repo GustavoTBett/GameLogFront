@@ -11,7 +11,7 @@ import { UserAccountMenu } from "./UserAccountMenu"
 
 export function Header() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const { isAuthenticated } = useAuth()
+  useAuth()
 
   return (
     <S.Nav>
