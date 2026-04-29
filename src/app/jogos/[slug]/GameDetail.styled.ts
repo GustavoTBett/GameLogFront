@@ -122,6 +122,14 @@ export const MetricRow = styled.div`
   margin-top: ${fromTheme((theme) => theme.spacing[16])};
 `;
 
+export const MetricRowThree = styled(MetricRow)`
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+
+  ${fromTheme((theme) => theme.media.tablet)} {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+`;
+
 export const Metric = styled.div`
   padding: ${fromTheme((theme) => theme.spacing[12])};
   border-radius: ${fromTheme((theme) => theme.spacing[8])};
@@ -133,7 +141,7 @@ export const MetricLabel = styled.p`
   color: ${fromTheme((theme) => theme.colors.mutedForeground)};
 `;
 
-export const MetricValue = styled.p`
+export const MetricValue = styled.div`
   margin-top: ${fromTheme((theme) => theme.spacing[4])};
   font-size: ${fromTheme((theme) => theme.fontSizes[18])};
   font-weight: ${fromTheme((theme) => theme.fontWeights.bold)};
@@ -199,4 +207,13 @@ export const EmptyIcon = styled.div`
   place-items: center;
   background: ${fromTheme((theme) => theme.colors.secondary)};
   color: ${fromTheme((theme) => theme.colors.primary)};
+`;
+
+export const SecondaryMetric = styled(Metric)`
+  border: 1px solid ${fromTheme((theme) => theme.colors.border)};
+  background: ${fromTheme((theme) => theme.colors.card)};
+`;
+
+export const ReviewFormWrap = styled.div`
+  margin-top: ${fromTheme((theme) => theme.spacing[24])};
 `;

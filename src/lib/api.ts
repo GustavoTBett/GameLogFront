@@ -11,6 +11,7 @@ import {
   ResetPasswordRequest,
 } from "@/types/auth";
 import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse } from "@/types/game";
+import { CreateRatingRequest, RatingResponse } from "@/types/rating";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -234,6 +235,25 @@ export const gamesAPI = {
 export const genresAPI = {
   getAll: async (): Promise<GenreOption[]> => {
     const { data } = await fetchAPI<GenreOption[]>("/genres");
+    return data;
+  },
+};
+
+export const ratingsAPI = {
+  create: async (payload: CreateRatingRequest): Promise<RatingResponse> => {
+    const { data } = await fetchAPI<RatingResponse>("/ratings", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    return data;
+  },
+  update: async (id: number, payload: CreateRatingRequest): Promise<RatingResponse> => {
+    const { data } = await fetchAPI<RatingResponse>(`/ratings/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+
     return data;
   },
 };

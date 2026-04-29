@@ -5,7 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Gamepad2, Star, User } from "lucide-react";
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
-import { gamesAPI } from "@/lib/api";
+import { RatingForm } from "@/components/features/ratings/RatingForm";
+import { StarRating } from "@/components/features/ratings/StarRating";
+import { gamesAPI, authAPI } from "@/lib/api";
+import { AuthUserResponse } from "@/types/auth";
 import { GameDetail } from "@/types/game";
 import * as S from "./GameDetail.styled";
 
@@ -35,40 +38,54 @@ export default function GameDetailPage() {
   const [game, setGame] = useState<GameDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUserResponse | null>(null);
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
 
-  useEffect(() => {
-    let isCancelled = false;
+  const loadGame = async (currentSlug: string, isCancelledRef: { current: boolean }) => {
+    setIsLoading(true);
+    setError(null);
 
-    const loadGame = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const data = await gamesAPI.getBySlug(slug);
-        if (!isCancelled) {
-          setGame(data);
-        }
-      } catch (err) {
-        if (!isCancelled) {
-          const message = err instanceof Error ? err.message : "Falha ao carregar o jogo";
-          setError(message);
-          setGame(null);
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
+    try {
+      const data = await gamesAPI.getBySlug(currentSlug);
+      if (!isCancelledRef.current) {
+        setGame(data);
+        // try to load current user (may 401 if not authenticated)
+        try {
+          const u = await authAPI.getCurrentUser();
+          if (!isCancelledRef.current) setCurrentUser(u);
+        } catch (e) {
+          if (!isCancelledRef.current) setCurrentUser(null);
         }
       }
-    };
+    } catch (err) {
+      if (!isCancelledRef.current) {
+        const message = err instanceof Error ? err.message : "Falha ao carregar o jogo";
+        setError(message);
+        setGame(null);
+      }
+    } finally {
+      if (!isCancelledRef.current) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const isCancelledRef = { current: false };
 
     if (slug) {
-      loadGame();
+      loadGame(slug, isCancelledRef);
     }
 
     return () => {
-      isCancelled = true;
+      isCancelledRef.current = true;
     };
   }, [slug]);
+
+  const refreshGame = async () => {
+    if (!slug) return;
+    await loadGame(slug, { current: false });
+  };
 
   if (isLoading) {
     return (
@@ -131,7 +148,7 @@ export default function GameDetailPage() {
                 <S.Chip>{game.totalReviews} avaliacoes</S.Chip>
               </S.ChipRow>
 
-              <S.MetricRow>
+              <S.MetricRowThree>
                 <S.Metric>
                   <S.MetricLabel>Media de avaliacao</S.MetricLabel>
                   <S.MetricValue>
@@ -140,10 +157,17 @@ export default function GameDetailPage() {
                   </S.MetricValue>
                 </S.Metric>
                 <S.Metric>
+                  <S.MetricLabel>Nota externa</S.MetricLabel>
+                  <S.MetricValue>
+                    <Star size={16} style={{ display: "inline", marginRight: 6 }} />
+                    {typeof game.defaultRating === "number" ? game.defaultRating.toFixed(1) : "Sem nota"}
+                  </S.MetricValue>
+                </S.Metric>
+                <S.Metric>
                   <S.MetricLabel>Slug</S.MetricLabel>
                   <S.MetricValue>{game.slug}</S.MetricValue>
                 </S.Metric>
-              </S.MetricRow>
+              </S.MetricRowThree>
             </S.CardBody>
           </S.Card>
 
@@ -174,6 +198,76 @@ export default function GameDetailPage() {
 
             <S.Section>
               <S.SectionTitle>Avaliacoes da comunidade</S.SectionTitle>
+              <S.ReviewFormWrap>
+                {currentUser ? (
+                  (() => {
+                    const userReview = game.reviews.find((r) => r.username === currentUser.username);
+                    if (userReview) {
+                      return (
+                        <div>
+                          <S.DetailCard>
+                            <S.MetricRow>
+                              <S.Metric>
+                                <S.MetricLabel>Sua nota</S.MetricLabel>
+                                <S.MetricValue>
+                                  <StarRating rating={userReview.score} size="sm" showValue />
+                                </S.MetricValue>
+                              </S.Metric>
+                              <S.Metric>
+                                <S.MetricLabel>Data</S.MetricLabel>
+                                <S.MetricValue>{formatReviewDate(userReview.createdAt)}</S.MetricValue>
+                              </S.Metric>
+                            </S.MetricRow>
+                            <S.Paragraph style={{ marginTop: 12 }}>
+                              <strong>{userReview.username}</strong>
+                            </S.Paragraph>
+                            <S.Paragraph>{userReview.review?.trim() ? userReview.review : "Sem comentario."}</S.Paragraph>
+                            <div style={{ marginTop: 12 }}>
+                              <button
+                                type="button"
+                                onClick={() => setEditingReviewId(userReview.id)}
+                                style={{
+                                  padding: "8px 12px",
+                                  borderRadius: 8,
+                                  background: "#0f9d58",
+                                  color: "white",
+                                  border: "none",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Editar avaliação
+                              </button>
+                            </div>
+                          </S.DetailCard>
+
+                          {editingReviewId === userReview.id ? (
+                            <div style={{ marginTop: 12 }}>
+                              <RatingForm
+                                gameId={game.id}
+                                editMode
+                                ratingId={userReview.id}
+                                initialScore={userReview.score}
+                                initialReview={userReview.review ?? ""}
+                                onSubmitted={() => {
+                                  setEditingReviewId(null);
+                                  refreshGame();
+                                }}
+                                onCancel={() => setEditingReviewId(null)}
+                              />
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    }
+
+                    // no user review -> show create form
+                    return <RatingForm gameId={game.id} onSubmitted={refreshGame} />;
+                  })()
+                ) : (
+                  <RatingForm gameId={game.id} onSubmitted={refreshGame} />
+                )}
+              </S.ReviewFormWrap>
+
               {game.reviews.length === 0 ? (
                 <S.EmptyState>
                   <S.EmptyIcon>
@@ -191,8 +285,7 @@ export default function GameDetailPage() {
                       <S.Metric>
                         <S.MetricLabel>Nota</S.MetricLabel>
                         <S.MetricValue>
-                          <Star size={16} style={{ display: "inline", marginRight: 6 }} />
-                          {review.score.toFixed(1)}
+                          <StarRating rating={review.score} size="sm" showValue />
                         </S.MetricValue>
                       </S.Metric>
                       <S.Metric>

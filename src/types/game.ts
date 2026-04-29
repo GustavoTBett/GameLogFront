@@ -16,6 +16,7 @@ export interface GameSummary {
   descriptionPtBr: string | null;
   coverUrl: string | null;
   averageRating: number;
+  defaultRating?: number | null;
   releaseDate: string | null;
   developer: string | null;
   totalReviews: number;
