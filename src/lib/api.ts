@@ -10,7 +10,7 @@ import {
   LoginRequest,
   ResetPasswordRequest,
 } from "@/types/auth";
-import { ExploreGamesFilters, GameSummary, GenreOption, PagedResponse } from "@/types/game";
+import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse } from "@/types/game";
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -222,6 +222,11 @@ export const gamesAPI = {
 
   getTopRated: async (limit = 6): Promise<GameSummary[]> => {
     const { data } = await fetchAPI<GameSummary[]>(`/games/top-rated?limit=${limit}`);
+    return data;
+  },
+
+  getBySlug: async (slug: string): Promise<GameDetail> => {
+    const { data } = await fetchAPI<GameDetail>(`/games/slug/${encodeURIComponent(slug)}`);
     return data;
   },
 };

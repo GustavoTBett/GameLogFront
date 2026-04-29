@@ -13,6 +13,7 @@ export interface GameSummary {
   name: string;
   slug: string;
   description: string | null;
+  descriptionPtBr: string | null;
   coverUrl: string | null;
   averageRating: number;
   releaseDate: string | null;
@@ -20,6 +21,18 @@ export interface GameSummary {
   totalReviews: number;
   genres: string[];
   platforms: GamePlatform[];
+}
+
+export interface GameReview {
+  id: number;
+  score: number;
+  review: string | null;
+  username: string;
+  createdAt: string;
+}
+
+export interface GameDetail extends GameSummary {
+  reviews: GameReview[];
 }
 
 export interface PagedResponse<T> {

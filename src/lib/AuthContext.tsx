@@ -10,6 +10,20 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
+type ApiErrorData = { message?: string };
+
+type ApiError = Error & {
+  data?: ApiErrorData;
+};
+
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+}
+
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,11 +53,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(userData);
       localStorage.setItem("auth_user", JSON.stringify(userData));
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Se houver erro (401, etc), limpar dados locais
       setUser(null);
       localStorage.removeItem("auth_user");
-      setError(err.message || "Erro ao verificar autenticação");
+      setError(getErrorMessage(err, "Erro ao verificar autenticação"));
     } finally {
       setIsLoading(false);
     }
@@ -60,11 +74,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const userData = await authAPI.login(identifier, password);
         setUser(userData);
         localStorage.setItem("auth_user", JSON.stringify(userData));
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const apiError = err as ApiError;
         setUser(null);
         localStorage.removeItem("auth_user");
         setError(
-          err.data?.message || err.message || "Erro ao fazer login"
+          apiError.data?.message || getErrorMessage(err, "Erro ao fazer login")
         );
         throw err;
       } finally {
@@ -84,7 +99,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       localStorage.removeItem("auth_user");
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erro ao fazer logout:", err);
       // Mesmo com erro, limpar dados locais
       setUser(null);

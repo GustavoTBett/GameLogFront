@@ -13,18 +13,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/features/Dropdown/DropdownMenu"
-import styled from "styled-components"
+import styled, { type DefaultTheme } from "styled-components"
+
+const fromTheme = <T,>(selector: (theme: DefaultTheme) => T) =>
+  ({ theme }: { theme: DefaultTheme }) => selector(theme)
 
 const LogoutButton = styled.button`
   display: flex;
   align-items: center;
-  gap: ${({ theme }) => (theme as any).spacing[8]};
+  gap: ${fromTheme((theme) => theme.spacing[8])};
   width: 100%;
   background: none;
   border: none;
   cursor: pointer;
-  color: ${({ theme }) => (theme as any).colors.destructive};
-  font-size: ${({ theme }) => (theme as any).fontSizes[14]};
+  color: ${fromTheme((theme) => theme.colors.destructive)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[14])};
   padding: 0;
   transition: all 0.2s;
   
