@@ -7,16 +7,16 @@ export const GlobalStyles = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* Suaviza a renderização das fontes em MacOS e Windows */
+    
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   html {
-    /* Garante que o scroll seja suave ao usar âncoras (#) */
+    
     scroll-behavior: smooth;
-    /* Evita que o zoom automático em inputs no iOS quebre o layout */
-    @media (max-width: ${({ theme }) => theme.breakpoints.mobile}) {
+    
+    @media (max-width: ${({ theme }) => theme.media.mobile}) {
       font-size: 93.75%;
     }
   }

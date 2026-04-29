@@ -34,7 +34,7 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const currentTheme = useMemo(() => themes[themeName || "dark"], [themeName]);
+  const currentTheme = useMemo<FullTheme>(() => themes[themeName || "dark"] as FullTheme, [themeName]);
 
   const contextValue = useMemo(() => ({
     themeName: themeName || "dark",

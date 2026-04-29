@@ -1,19 +1,19 @@
 "use client"
 
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { User, Heart, Sparkles, LogOut } from "lucide-react"
+import styled, { DefaultTheme } from "styled-components"
 import * as S from "./Header.styled"
-import { useAuth } from "@/hooks/useAuth"
-import { ThemeToggle } from "@/components/features/ThemeToggle/ThemeToggle"
+import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/features/Dropdown/DropdownMenu"
-import styled, { type DefaultTheme } from "styled-components"
+} from "@/components/ui/dropdown/DropdownMenu"
 
 const fromTheme = <T,>(selector: (theme: DefaultTheme) => T) =>
   ({ theme }: { theme: DefaultTheme }) => selector(theme)

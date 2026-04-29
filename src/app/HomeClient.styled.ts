@@ -17,7 +17,7 @@ export const HeroBackground = styled.div`
   inset: 0;
   background: linear-gradient(
     135deg,
-    ${({ theme }) => theme.brand.green}16 0%,
+    ${({ theme }) => theme.colors.primary}16 0%,
     ${({ theme }) => theme.colors.background} 40%,
     ${({ theme }) => theme.colors.background} 100%
   );
@@ -50,7 +50,7 @@ export const HeroTitle = styled.h1`
 `;
 
 export const HeroAccent = styled.span`
-  color: ${({ theme }) => theme.brand.green};
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const HeroDescription = styled.p`
@@ -84,12 +84,12 @@ export const HeroButton = styled(Link)<{ $variant?: "primary" | "outline" }>`
   border-radius: ${({ theme }) => theme.spacing[8]};
   border: 1px solid
     ${({ theme, $variant }) =>
-      $variant === "outline" ? theme.colors.border : theme.brand.green};
+      $variant === "outline" ? theme.colors.border : theme.colors.primary};
   font-size: ${({ theme }) => theme.fontSizes[14]};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
   transition: all 0.2s ease;
   background: ${({ theme, $variant }) =>
-    $variant === "outline" ? "transparent" : theme.brand.green};
+    $variant === "outline" ? "transparent" : theme.colors.primary};
   color: ${({ theme, $variant }) =>
     $variant === "outline" ? theme.colors.foreground : theme.colors.primaryForeground};
 
@@ -164,7 +164,7 @@ export const SectionLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing[8]};
-  color: ${({ theme }) => theme.brand.green};
+  color: ${({ theme }) => theme.colors.primary};
   font-size: ${({ theme }) => theme.fontSizes[14]};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
 `;
