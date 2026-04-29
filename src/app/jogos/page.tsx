@@ -171,11 +171,16 @@ export default function GamesPage() {
               aria-label="Filtrar por nota mínima"
             >
               <option value="">Qualquer nota</option>
+              <option value="1">A partir de 1</option>
+              <option value="2">A partir de 2</option>
+              <option value="3">A partir de 3</option>
+              <option value="4">A partir de 4</option>
               <option value="5">A partir de 5</option>
               <option value="6">A partir de 6</option>
               <option value="7">A partir de 7</option>
               <option value="8">A partir de 8</option>
               <option value="9">A partir de 9</option>
+              <option value="10">A partir de 10</option>
             </S.Select>
 
             <S.Select
