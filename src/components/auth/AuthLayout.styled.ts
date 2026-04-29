@@ -17,7 +17,7 @@ export const AuthBackground = styled.div`
   inset: 0;
   background: linear-gradient(
     135deg,
-    ${(props) => props.theme.brand.green}08 0%,
+    ${(props) => props.theme.colors.primary}08 0%,
     ${(props) => props.theme.colors.background} 45%,
     ${(props) => props.theme.colors.background} 100%
   );
@@ -56,7 +56,7 @@ export const LogoContainer = styled(Link)`
   }
 
   svg {
-    color: ${(props) => props.theme.brand.green};
+    color: ${(props) => props.theme.colors.primary};
     width: 40px;
     height: 40px;
   }
@@ -160,8 +160,8 @@ export const StyledInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: ${(props) => props.theme.brand.green};
-    box-shadow: 0 0 0 2px ${(props) => props.theme.brand.green}26;
+    border-color: ${(props) => props.theme.colors.primary};
+    box-shadow: 0 0 0 2px ${(props) => props.theme.colors.primary}26;
   }
 
   &:disabled {
@@ -224,17 +224,17 @@ export const SubmitError = styled.div`
 export const SubmitSuccess = styled.div`
   padding: ${(props) => props.theme.spacing[12]};
   border-radius: ${(props) => props.theme.spacing[8]};
-  background-color: ${(props) => props.theme.brand.green}15;
-  color: ${(props) => props.theme.brand.green};
+  background-color: ${(props) => props.theme.colors.primary}15;
+  color: ${(props) => props.theme.colors.primary};
   font-size: ${(props) => props.theme.fontSizes[14]};
-  border: 1px solid ${(props) => props.theme.brand.green}30;
+  border: 1px solid ${(props) => props.theme.colors.primary}30;
 `;
 
 export const ForgotPasswordLink = styled(Link)`
   display: flex;
   justify-content: flex-end;
   font-size: ${(props) => props.theme.fontSizes[14]};
-  color: ${(props) => props.theme.brand.green};
+  color: ${(props) => props.theme.colors.primary};
   text-decoration: none;
   font-weight: ${(props) => props.theme.fontWeights.medium};
   transition: opacity 0.2s ease;
@@ -249,7 +249,7 @@ export const SubmitButton = styled.button`
   padding: ${(props) => props.theme.spacing[8]} ${(props) => props.theme.spacing[16]};
   border: none;
   border-radius: 0.375rem;
-  background-color: ${(props) => props.theme.brand.green};
+  background-color: ${(props) => props.theme.colors.primary};
   color: white;
   font-size: ${(props) => props.theme.fontSizes[14]};
   font-weight: ${(props) => props.theme.fontWeights.medium};
@@ -280,7 +280,7 @@ export const FooterText = styled.div`
 `;
 
 export const FooterLink = styled(Link)`
-  color: ${(props) => props.theme.brand.green};
+  color: ${(props) => props.theme.colors.primary};
   text-decoration: none;
   font-weight: ${(props) => props.theme.fontWeights.medium};
   margin-left: ${(props) => props.theme.spacing[4]};

@@ -16,13 +16,13 @@ export const StyledInput = styled.input`
   }
 
   &:hover:not(:disabled) {
-    border-color: ${(props) => props.theme.brand.green};
+    border-color: ${(props) => props.theme.colors.primary};
   }
 
   &:focus {
     outline: none;
-    border-color: ${(props) => props.theme.brand.green};
-    box-shadow: 0 0 0 3px ${(props) => props.theme.brand.green}15;
+    border-color: ${(props) => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${(props) => props.theme.colors.primary}15;
   }
 
   &:disabled {

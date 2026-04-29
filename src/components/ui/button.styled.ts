@@ -38,12 +38,12 @@ const sizeStyles = {
 
 const variantStyles = {
   primary: `
-    background-color: ${(props: ThemeProps) => props.theme.brand.green};
+    background-color: ${(props: ThemeProps) => props.theme.colors.primary};
     color: white;
     border: 1px solid transparent;
     
     &:hover:not(:disabled) {
-      background-color: ${(props: ThemeProps) => props.theme.brand.green}DD;
+      background-color: ${(props: ThemeProps) => props.theme.colors.primary}DD;
       opacity: 0.9;
     }
   `,
@@ -99,7 +99,7 @@ export const StyledButton = styled.button<ButtonProps>`
   }
   
   &:focus-visible {
-    outline: 2px solid ${(props) => props.theme.brand.green};
+    outline: 2px solid ${(props) => props.theme.colors.primary};
     outline-offset: 2px;
   }
 `;
