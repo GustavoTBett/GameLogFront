@@ -67,7 +67,7 @@ const sharedTheme = {
     2: "0.125rem", 4: "0.25rem", 6: "0.375rem", 8: "0.5rem", 10: "0.625rem",12: "0.75rem", 16: "1rem", 20: "1.25rem", 24: "1.5rem", 32: "2rem", 40: "2.5rem", 48: "3rem", 64: "4rem",
   },
   fontSizes: {
-    12: "0.75rem", 14: "0.875rem", 16: "1rem", 18: "1.125rem", 20: "1.25rem", 24: "1.5rem", 32: "2rem", 40: "2.5rem", 48: "3rem", 64: "4rem",
+    10: "0.625rem", 12: "0.75rem", 14: "0.875rem", 16: "1rem", 18: "1.125rem", 20: "1.25rem", 24: "1.5rem", 32: "2rem", 40: "2.5rem", 48: "3rem", 64: "4rem",
   },
   fontWeights: { regular: 400, medium: 500, bold: 700 },
   lineHeights: { none: 1, tight: 1.25, normal: 1.5, tall: 1.8 },
