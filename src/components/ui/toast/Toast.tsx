@@ -46,3 +46,10 @@ export {
   ToastClose,
   ToastAction,
 };
+
+// Type exports for external usage
+export type ToastProps = React.ComponentProps<typeof ToastPrimitives.Root> & {
+  variant?: 'default' | 'destructive'
+}
+
+export type ToastActionElement = React.ReactNode

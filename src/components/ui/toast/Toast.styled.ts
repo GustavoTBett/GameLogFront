@@ -14,41 +14,39 @@ const hide = keyframes`
 
 export const ToastViewportRoot = styled(ToastPrimitives.Viewport)`
   position: fixed;
-  top: 0;
-  z-index: 100;
+  bottom: 16px;
+  left: 16px;
+  z-index: 9999;
   display: flex;
-  max-height: 100vh;
-  width: 100%;
-  flex-direction: column-reverse;
-  padding: ${({ theme }) => theme.spacing[16]};
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing[12]};
+  max-height: calc(100vh - 32px);
+  width: auto;
+  padding: 0;
 
   ${({ theme }) => theme.media.tablet} {
-    bottom: 0;
-    right: 0;
-    top: auto;
-    flex-direction: column;
+    left: 16px;
+    bottom: 16px;
     max-width: 420px;
   }
 `;
 
 export const ToastRootStyled = styled(ToastPrimitives.Root)<{ $variant?: 'default' | 'destructive' }>`
-  background-color: ${({ theme }) => theme.colors.background};
+  background-color: ${({ theme }) => theme.colors.card};
   border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 6px;
-  box-shadow: ${({ theme }) => theme.shadows.shadow3};
-  padding: ${({ theme }) => theme.spacing[24]};
-  padding-right: ${({ theme }) => theme.spacing[32]};
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.15);
+  padding: ${({ theme }) => `${theme.spacing[16]} ${theme.spacing[20]}`};
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: ${({ theme }) => theme.spacing[16]};
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing[12]};
   overflow: hidden;
   position: relative;
   pointer-events: auto;
-  transition: all 0.2s;
+  transition: transform 160ms ease, box-shadow 160ms ease, opacity 120ms ease;
 
   &[data-state='open'] {
-    animation: ${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: ${slideIn} 180ms cubic-bezier(0.16, 1, 0.3, 1);
   }
   &[data-state='closed'] {
     animation: ${hide} 100ms ease-in;
@@ -58,8 +56,24 @@ export const ToastRootStyled = styled(ToastPrimitives.Root)<{ $variant?: 'defaul
     $variant === 'destructive' &&
     css`
       border-color: ${theme.colors.destructive};
-      background-color: ${theme.colors.destructive};
+      background: linear-gradient(90deg, ${theme.colors.destructive}10, ${theme.colors.card});
+      box-shadow: 0 12px 28px rgba(239,68,68,0.12);
       color: ${theme.colors.destructiveForeground};
+
+      & ${ToastTitleStyled} {
+        color: ${theme.colors.destructiveForeground};
+      }
+
+      /* subtle left accent */
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+        background: ${theme.colors.destructive};
+      }
     `}
 `;
 
@@ -90,7 +104,7 @@ export const ToastCloseStyled = styled(ToastPrimitives.Close)`
   right: 0.5rem;
   border-radius: 6px;
   padding: 4px;
-  color: ${({ theme }) => theme.colors.foreground}80;
+  color: ${({ theme }) => theme.colors.foreground}CC;
   opacity: 0;
   transition: opacity 0.2s;
   background: transparent;
@@ -103,11 +117,14 @@ export const ToastCloseStyled = styled(ToastPrimitives.Close)`
 `;
 
 export const ToastTitleStyled = styled(ToastPrimitives.Title)`
-  font-size: ${({ theme }) => theme.fontSizes[14]};
+  font-size: ${({ theme }) => theme.fontSizes[16]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
+  margin-bottom: ${({ theme }) => theme.spacing[4]};
 `;
 
 export const ToastDescriptionStyled = styled(ToastPrimitives.Description)`
   font-size: ${({ theme }) => theme.fontSizes[14]};
-  opacity: 0.9;
+  opacity: 0.95;
+  line-height: 1.3;
+  color: ${({ theme }) => theme.colors.foreground};
 `;

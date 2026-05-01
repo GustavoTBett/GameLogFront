@@ -2,6 +2,8 @@
 
 import { FormEvent, useState } from "react";
 import styled from "styled-components";
+import { Button as UIButton } from '@/components/ui/button/Button'
+import { Textarea as UITextarea } from '@/components/ui/textarea/Textarea'
 import { Loader2, Send } from "lucide-react";
 import { ratingsAPI } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
@@ -51,16 +53,6 @@ const Field = styled.label`
   font-weight: ${({ theme }) => theme.fontWeights.medium};
 `;
 
-const Textarea = styled.textarea`
-  min-height: 120px;
-  width: 100%;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.spacing[8]};
-  background: ${({ theme }) => theme.colors.input};
-  color: ${({ theme }) => theme.colors.foreground};
-  padding: ${({ theme }) => theme.spacing[12]};
-  resize: vertical;
-`;
 
 const ActionRow = styled.div`
   display: flex;
@@ -77,7 +69,7 @@ const Button = styled.button`
   padding: ${({ theme }) => `${theme.spacing[12]} ${theme.spacing[16]}`};
   border: 0;
   border-radius: ${({ theme }) => theme.spacing[8]};
-  background: ${({ theme }) => theme.brand.green};
+  background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primaryForeground};
   font-weight: ${({ theme }) => theme.fontWeights.medium};
 
@@ -90,7 +82,7 @@ const Button = styled.button`
 const Message = styled.p<{ $tone?: "default" | "error" | "success" }>`
   color: ${({ theme, $tone }) => {
     if ($tone === "error") return theme.colors.destructive;
-    if ($tone === "success") return theme.brand.green;
+    if ($tone === "success") return theme.colors.primary;
     return theme.colors.mutedForeground;
   }};
   font-size: ${({ theme }) => theme.fontSizes[14]};
@@ -182,37 +174,37 @@ export function RatingForm({ gameId, onSubmitted, editMode, ratingId, initialSco
       <Title>Deixe sua avaliação</Title>
       <Subtitle>{editMode ? "Edite sua avaliação" : "A nota influencia a média da comunidade. O comentário é opcional."}</Subtitle>
 
-      <Form onSubmit={handleSubmit}>
-        <Field>
-          Sua nota
-          <StarRating rating={score} size="lg" interactive onRatingChange={setScore} showValue />
-        </Field>
+          <Form onSubmit={handleSubmit}>
+            <Field>
+              Sua nota
+              <StarRating rating={score} size="lg" interactive onRatingChange={setScore} showValue />
+            </Field>
 
-        <Field>
-          Comentário opcional
-          <Textarea
-            value={review}
-            onChange={(event) => setReview(event.target.value)}
-            placeholder="Escreva algo sobre jogabilidade, gráficos, história ou desempenho..."
-          />
-        </Field>
+            <Field>
+              Comentário opcional
+              <UITextarea
+                value={review}
+                onChange={(event) => setReview(event.target.value)}
+                placeholder="Escreva algo sobre jogabilidade, gráficos, história ou desempenho..."
+              />
+            </Field>
 
-        <ActionRow>
-          <Message $tone={tone}>{message ?? "Seu texto pode complementar a nota, mas não é obrigatório."}</Message>
+            <ActionRow>
+              <Message $tone={tone}>{message ?? "Seu texto pode complementar a nota, mas não é obrigatório."}</Message>
 
-          <div style={{ display: "flex", gap: 12 }}>
-            <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-              {isSubmitting ? (editMode ? "Salvando..." : "Enviando...") : editMode ? "Salvar alteração" : "Publicar avaliação"}
-            </Button>
-            {editMode && onCancel ? (
-              <button type="button" onClick={onCancel} style={{ background: "transparent", border: 0, color: "var(--muted)" }}>
-                Cancelar
-              </button>
-            ) : null}
-          </div>
-        </ActionRow>
-      </Form>
+              <div style={{ display: "flex", gap: 12 }}>
+                <UIButton type="submit" disabled={!canSubmit}>
+                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                  {isSubmitting ? (editMode ? "Salvando..." : "Enviando...") : editMode ? "Salvar alteração" : "Publicar avaliação"}
+                </UIButton>
+                {editMode && onCancel ? (
+                  <UIButton variant="ghost" type="button" onClick={onCancel}>
+                    Cancelar
+                  </UIButton>
+                ) : null}
+              </div>
+            </ActionRow>
+          </Form>
     </Wrapper>
   );
 }
