@@ -3,6 +3,7 @@
 import { KeyboardEvent } from "react";
 import { Star } from "lucide-react";
 import styled from "styled-components";
+import { Button as UIButton } from '@/components/ui/button/Button'
 
 interface StarRatingProps {
   rating: number;
@@ -25,31 +26,7 @@ const Wrapper = styled.div<{ $gap: string }>`
   gap: ${({ $gap }) => $gap};
 `;
 
-const StarButton = styled.button<{ $interactive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: ${({ $interactive }) => ($interactive ? "pointer" : "default")};
-  transition: transform 0.15s ease;
-
-  ${({ $interactive }) =>
-    $interactive
-      ? `
-        &:hover {
-          transform: translateY(-1px) scale(1.05);
-        }
-
-        &:focus-visible {
-          outline: 2px solid currentColor;
-          outline-offset: 3px;
-          border-radius: 8px;
-        }
-      `
-      : ""}
-`;
+/* Use shared UI Button for icon buttons to keep focus/hover consistent */
 
 const Value = styled.span<{ $size: "sm" | "md" | "lg" }>`
   margin-left: 0.5rem;
@@ -95,21 +72,22 @@ export function StarRating({
         const partial = !filled && index < rating;
 
         return (
-          <StarButton
-            key={index}
-            type="button"
-            $interactive={interactive}
-            onClick={() => handleSelect(index)}
-            onKeyDown={(event) => handleKeyDown(event, index)}
-            aria-label={interactive ? `Avaliar com ${index + 1} estrelas` : undefined}
-            disabled={!interactive}
-          >
-            <Star
-              size={iconSize}
-              fill={filled || partial ? "currentColor" : "none"}
-              opacity={filled ? 1 : partial ? 0.6 : 0.35}
-            />
-          </StarButton>
+          <UIButton
+              key={index}
+              size={size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'}
+              variant={interactive ? 'ghost' : 'ghost'}
+              type="button"
+              onClick={() => handleSelect(index)}
+              onKeyDown={(event) => handleKeyDown(event, index)}
+              aria-label={interactive ? `Avaliar com ${index + 1} estrelas` : undefined}
+              disabled={!interactive}
+            >
+              <Star
+                size={iconSize}
+                fill={filled || partial ? "currentColor" : "none"}
+                opacity={filled ? 1 : partial ? 0.6 : 0.35}
+              />
+            </UIButton>
         );
       })}
 

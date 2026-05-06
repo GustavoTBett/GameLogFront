@@ -12,6 +12,7 @@ import {
 } from "@/types/auth";
 import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse } from "@/types/game";
 import { CreateRatingRequest, RatingResponse } from "@/types/rating";
+import { showErrorToast } from '@/lib/toast';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
@@ -94,6 +95,12 @@ async function fetchAPI<T = unknown>(
       error.status = response.status;
       error.data = data;
 
+      // Mostrar mensagem do backend se existir
+      try {
+        const maybeMessage = (data as any)?.message;
+        if (maybeMessage) showErrorToast(String(maybeMessage));
+      } catch (_) {}
+
       // Se for 401, usuário não autenticado - logout automático
       if (response.status === 401) {
         // Disparar evento para logout automático (será tratado no contexto)
@@ -107,7 +114,11 @@ async function fetchAPI<T = unknown>(
   } catch (error) {
     // Se for erro de rede, re-lançar
     if (error instanceof TypeError) {
-      throw new Error(`Erro de conexão: ${error.message}`);
+      const errorMessage = `Erro de conexão: ${error.message}`;
+      try {
+        showErrorToast(errorMessage);
+      } catch (_) {}
+      throw new Error(errorMessage);
     }
     throw error;
   }

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { User, Heart, Sparkles, LogOut } from "lucide-react"
-import styled, { DefaultTheme } from "styled-components"
+import { DefaultTheme } from "styled-components"
 import * as S from "./Header.styled"
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle"
 import {
@@ -18,28 +18,7 @@ import {
 const fromTheme = <T,>(selector: (theme: DefaultTheme) => T) =>
   ({ theme }: { theme: DefaultTheme }) => selector(theme)
 
-const LogoutButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${fromTheme((theme) => theme.spacing[8])};
-  width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: ${fromTheme((theme) => theme.colors.destructive)};
-  font-size: ${fromTheme((theme) => theme.fontSizes[14])};
-  padding: 0;
-  transition: all 0.2s;
-  
-  &:hover {
-    opacity: 0.8;
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
+/* local LogoutButton replaced by DropdownMenuItem variant="destructive" */
 
 export function UserAccountMenu() {
   const router = useRouter()
@@ -93,10 +72,8 @@ export function UserAccountMenu() {
             <S.MenuLink href="/recomendacoes"><Sparkles size={16} /> Recomendações</S.MenuLink>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <LogoutButton onClick={handleLogout} disabled={isLoading}>
-              <LogOut size={16} /> Sair
-            </LogoutButton>
+          <DropdownMenuItem onClick={handleLogout} variant="destructive" aria-disabled={isLoading}>
+            <LogOut size={16} /> Sair
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

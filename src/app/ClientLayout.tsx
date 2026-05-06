@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useAuthInit } from "@/hooks/useAuthInit";
+import { Toaster } from '@/components/ui/toaster/Toaster';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -13,5 +14,11 @@ interface ClientLayoutProps {
  */
 export default function ClientLayout({ children }: ClientLayoutProps) {
   useAuthInit();
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <Toaster />
+      {/* Dev-only test button removed */}
+    </>
+  );
 }

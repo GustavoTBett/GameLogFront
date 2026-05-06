@@ -3,6 +3,20 @@
 import { useState } from "react";
 import Link from "next/link";
 import styled from "styled-components";
+import { Card, CardContent } from "@/components/ui/card";
+
+// Ensure all game cards share the same height in grids
+const StyledCard = styled(Card)`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+`;
 import { ArrowRight, Star } from "lucide-react";
 import { GameSummary } from "@/types/game";
 
@@ -37,15 +51,7 @@ const CardLink = styled(Link)`
   }
 `;
 
-const CardShell = styled.article`
-  height: 100%;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.spacing[8]};
-  overflow: hidden;
-  background: ${({ theme }) => theme.colors.card};
-  box-shadow: ${({ theme }) => theme.shadows.shadow1};
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-`;
+/* Replaced CardShell with UI `Card` component */
 
 const Cover = styled.div`
   position: relative;
@@ -112,9 +118,7 @@ const Hint = styled.div`
   transition: opacity 0.2s ease, transform 0.2s ease;
 `;
 
-const Body = styled.div`
-  padding: ${({ theme }) => theme.spacing[12]};
-`;
+/* Using UI `CardContent` instead of local Body */
 
 const Title = styled.h3`
   font-size: ${({ theme }) => theme.fontSizes[16]};
@@ -156,7 +160,7 @@ export function GameCard({ game, href }: GameCardProps) {
 
   return (
     <CardLink href={href} aria-label={`Abrir detalhes de ${game.name}`}>
-      <CardShell>
+        <StyledCard>
         <Cover className="game-card-cover">
           {!imageError && game.coverUrl ? (
             <img
@@ -180,7 +184,7 @@ export function GameCard({ game, href }: GameCardProps) {
           </Hint>
         </Cover>
 
-        <Body>
+        <StyledCardContent>
           <Title>{game.name}</Title>
 
           <MetaRow>
@@ -196,8 +200,8 @@ export function GameCard({ game, href }: GameCardProps) {
               <Badge key={platform}>{platform}</Badge>
             ))}
           </MetaRow>
-        </Body>
-      </CardShell>
+        </StyledCardContent>
+      </StyledCard>
     </CardLink>
   );
 }
