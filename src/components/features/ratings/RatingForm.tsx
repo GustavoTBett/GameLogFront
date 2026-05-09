@@ -62,23 +62,6 @@ const ActionRow = styled.div`
   gap: ${({ theme }) => theme.spacing[12]};
 `;
 
-const Button = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing[8]};
-  padding: ${({ theme }) => `${theme.spacing[12]} ${theme.spacing[16]}`};
-  border: 0;
-  border-radius: ${({ theme }) => theme.spacing[8]};
-  background: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.primaryForeground};
-  font-weight: ${({ theme }) => theme.fontWeights.medium};
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-`;
-
 const Message = styled.p<{ $tone?: "default" | "error" | "success" }>`
   color: ${({ theme, $tone }) => {
     if ($tone === "error") return theme.colors.destructive;

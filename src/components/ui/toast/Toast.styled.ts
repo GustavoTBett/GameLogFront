@@ -58,10 +58,10 @@ export const ToastRootStyled = styled(ToastPrimitives.Root)<{ $variant?: 'defaul
       border-color: ${theme.colors.destructive};
       background: linear-gradient(90deg, ${theme.colors.destructive}10, ${theme.colors.card});
       box-shadow: 0 12px 28px rgba(239,68,68,0.12);
-      color: ${theme.colors.destructiveForeground};
+      color: ${theme.colors.foreground};
 
       & ${ToastTitleStyled} {
-        color: ${theme.colors.destructiveForeground};
+        color: ${theme.colors.destructive};
       }
 
       /* subtle left accent */
@@ -120,6 +120,7 @@ export const ToastTitleStyled = styled(ToastPrimitives.Title)`
   font-size: ${({ theme }) => theme.fontSizes[16]};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
   margin-bottom: ${({ theme }) => theme.spacing[4]};
+  color: ${({ theme }) => theme.colors.foreground};
 `;
 
 export const ToastDescriptionStyled = styled(ToastPrimitives.Description)`

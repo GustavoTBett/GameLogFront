@@ -30,6 +30,10 @@ export interface GameReview {
   review: string | null;
   username: string;
   createdAt: string;
+  updatedAt?: string | null;
+  upvoteCount: number;
+  downvoteCount: number;
+  userVote?: "UPVOTE" | "DOWNVOTE" | null;
 }
 
 export interface GameDetail extends GameSummary {
@@ -55,4 +59,18 @@ export interface ExploreGamesFilters {
   genreId?: number;
   platform?: GamePlatform;
   minRating?: number;
+  q?: string;
+}
+
+export interface RecommendationResponse {
+  gameName: string;
+  gameSlug: string | null;
+  reason: string;
+  gameId: number | null;
+  averageRating: number;
+  defaultRating?: number | null;
+  isNewlyImported: boolean;
+  coverUrl: string | null;
+  releaseDate?: string | null;
+  generatedAt: string;
 }

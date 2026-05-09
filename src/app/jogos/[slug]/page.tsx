@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Gamepad2, Star, User } from "lucide-react";
+import { ArrowLeft, Gamepad2, Heart, Loader2, PenLine, Star, User } from "lucide-react";
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
 import { RatingForm } from "@/components/features/ratings/RatingForm";
-import { StarRating } from "@/components/features/ratings/StarRating";
-import { gamesAPI, authAPI } from "@/lib/api";
+import { ReviewVoteControls } from "@/components/features/ratings/ReviewVoteControls";
+import { gamesAPI, authAPI, favoritesAPI } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 import { AuthUserResponse } from "@/types/auth";
 import { GameDetail } from "@/types/game";
 import * as S from "./GameDetail.styled";
@@ -30,6 +32,14 @@ function formatReviewDate(value: string): string {
   });
 }
 
+function formatReviewUpdatedDate(createdAt: string, updatedAt?: string | null): string {
+  if (!updatedAt || updatedAt === createdAt) {
+    return formatReviewDate(createdAt);
+  }
+
+  return formatReviewDate(updatedAt);
+}
+
 export default function GameDetailPage() {
   const params = useParams<{ slug: string }>();
   const router = useRouter();
@@ -40,6 +50,28 @@ export default function GameDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<AuthUserResponse | null>(null);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+
+  const currentUserReview = useMemo(() => {
+    if (!game || !currentUser) {
+      return null;
+    }
+
+    return game.reviews.find((review) => review.username === currentUser.username) ?? null;
+  }, [currentUser, game]);
+
+  const reviewsToRender = useMemo(() => {
+    if (!game) {
+      return [];
+    }
+
+    if (!currentUserReview) {
+      return game.reviews;
+    }
+
+    return [currentUserReview, ...game.reviews.filter((review) => review.id !== currentUserReview.id)];
+  }, [currentUserReview, game]);
 
   const loadGame = async (currentSlug: string, isCancelledRef: { current: boolean }) => {
     setIsLoading(true);
@@ -49,12 +81,28 @@ export default function GameDetailPage() {
       const data = await gamesAPI.getBySlug(currentSlug);
       if (!isCancelledRef.current) {
         setGame(data);
+        setIsFavorite(false);
         // try to load current user (may 401 if not authenticated)
         try {
           const u = await authAPI.getCurrentUser();
-          if (!isCancelledRef.current) setCurrentUser(u);
-        } catch (e) {
-          if (!isCancelledRef.current) setCurrentUser(null);
+          if (!isCancelledRef.current) {
+            setCurrentUser(u);
+            try {
+              const status = await favoritesAPI.getStatus(data.id);
+              if (!isCancelledRef.current) {
+                setIsFavorite(status.favorite);
+              }
+            } catch {
+              if (!isCancelledRef.current) {
+                setIsFavorite(false);
+              }
+            }
+          }
+        } catch {
+          if (!isCancelledRef.current) {
+            setCurrentUser(null);
+            setIsFavorite(false);
+          }
         }
       }
     } catch (err) {
@@ -85,6 +133,49 @@ export default function GameDetailPage() {
   const refreshGame = async () => {
     if (!slug) return;
     await loadGame(slug, { current: false });
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!game) {
+      return;
+    }
+
+    if (!currentUser) {
+      router.push("/login");
+      return;
+    }
+
+    setIsFavoriteLoading(true);
+
+    try {
+      if (isFavorite) {
+        await favoritesAPI.unfavorite(game.id);
+        setIsFavorite(false);
+        toast({
+          title: "Removido dos favoritos",
+          description: `${game.name} saiu da sua lista.`,
+          duration: 3500,
+        });
+      } else {
+        const status = await favoritesAPI.favorite(game.id);
+        setIsFavorite(status.favorite);
+        toast({
+          title: "Adicionado aos favoritos",
+          description: `${game.name} entrou na sua lista.`,
+          duration: 3500,
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Nao foi possivel atualizar favorito";
+      toast({
+        title: "Erro ao favoritar",
+        description: message,
+        variant: "destructive",
+        duration: 4500,
+      });
+    } finally {
+      setIsFavoriteLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -133,7 +224,13 @@ export default function GameDetailPage() {
           <S.Card>
             <S.Cover>
               {game.coverUrl ? (
-                <img src={game.coverUrl} alt={`Capa de ${game.name}`} loading="eager" />
+                <Image
+                  src={game.coverUrl}
+                  alt={`Capa de ${game.name}`}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 38vw, 100vw"
+                />
               ) : (
                 <S.CoverFallback>
                   <Gamepad2 size={48} />
@@ -172,8 +269,24 @@ export default function GameDetailPage() {
           </S.Card>
 
           <div>
-            <S.Title>{game.name}</S.Title>
-            <S.SubTitle>Informacoes completas do jogo e avaliacoes da comunidade.</S.SubTitle>
+            <S.TitleRow>
+              <S.Title>{game.name}</S.Title>
+              <S.FavoriteButton
+                type="button"
+                $active={isFavorite}
+                aria-pressed={isFavorite}
+                onClick={handleToggleFavorite}
+                disabled={isFavoriteLoading}
+              >
+                {isFavoriteLoading ? (
+                  <Loader2 size={18} className="spin" />
+                ) : (
+                  <Heart size={18} fill={isFavorite ? "currentColor" : "none"} />
+                )}
+                {isFavorite ? "Favoritado" : currentUser ? "Favoritar" : "Entrar para favoritar"}
+              </S.FavoriteButton>
+            </S.TitleRow>
+            <S.SubTitle>Informacoes completas do jogo e avaliações da comunidade.</S.SubTitle>
 
             <S.ChipRow>
               {game.genres.map((genre) => (
@@ -182,7 +295,7 @@ export default function GameDetailPage() {
             </S.ChipRow>
 
             <S.Section>
-              <S.SectionTitle>Descricoes</S.SectionTitle>
+              <S.SectionTitle>Descrições</S.SectionTitle>
               <S.DescriptionGrid>
                 <S.DescriptionColumn>
                   <S.DescriptionColumnTitle>Descricao (EN)</S.DescriptionColumnTitle>
@@ -198,77 +311,13 @@ export default function GameDetailPage() {
 
             <S.Section>
               <S.SectionTitle>Avaliacoes da comunidade</S.SectionTitle>
-              <S.ReviewFormWrap>
-                {currentUser ? (
-                  (() => {
-                    const userReview = game.reviews.find((r) => r.username === currentUser.username);
-                    if (userReview) {
-                      return (
-                        <div>
-                          <S.DetailCard>
-                            <S.MetricRow>
-                              <S.Metric>
-                                <S.MetricLabel>Sua nota</S.MetricLabel>
-                                <S.MetricValue>
-                                  <StarRating rating={userReview.score} size="sm" showValue />
-                                </S.MetricValue>
-                              </S.Metric>
-                              <S.Metric>
-                                <S.MetricLabel>Data</S.MetricLabel>
-                                <S.MetricValue>{formatReviewDate(userReview.createdAt)}</S.MetricValue>
-                              </S.Metric>
-                            </S.MetricRow>
-                            <S.Paragraph style={{ marginTop: 12 }}>
-                              <strong>{userReview.username}</strong>
-                            </S.Paragraph>
-                            <S.Paragraph>{userReview.review?.trim() ? userReview.review : "Sem comentario."}</S.Paragraph>
-                            <div style={{ marginTop: 12 }}>
-                              <button
-                                type="button"
-                                onClick={() => setEditingReviewId(userReview.id)}
-                                style={{
-                                  padding: "8px 12px",
-                                  borderRadius: 8,
-                                  background: "#0f9d58",
-                                  color: "white",
-                                  border: "none",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                Editar avaliação
-                              </button>
-                            </div>
-                          </S.DetailCard>
-
-                          {editingReviewId === userReview.id ? (
-                            <div style={{ marginTop: 12 }}>
-                              <RatingForm
-                                gameId={game.id}
-                                editMode
-                                ratingId={userReview.id}
-                                initialScore={userReview.score}
-                                initialReview={userReview.review ?? ""}
-                                onSubmitted={() => {
-                                  setEditingReviewId(null);
-                                  refreshGame();
-                                }}
-                                onCancel={() => setEditingReviewId(null)}
-                              />
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    }
-
-                    // no user review -> show create form
-                    return <RatingForm gameId={game.id} onSubmitted={refreshGame} />;
-                  })()
-                ) : (
+              {!currentUserReview ? (
+                <S.ReviewFormWrap>
                   <RatingForm gameId={game.id} onSubmitted={refreshGame} />
-                )}
-              </S.ReviewFormWrap>
+                </S.ReviewFormWrap>
+              ) : null}
 
-              {game.reviews.length === 0 ? (
+              {reviewsToRender.length === 0 ? (
                 <S.EmptyState>
                   <S.EmptyIcon>
                     <User size={18} />
@@ -279,27 +328,73 @@ export default function GameDetailPage() {
                   </div>
                 </S.EmptyState>
               ) : (
-                game.reviews.map((review) => (
-                  <S.DetailCard key={review.id} style={{ marginTop: "12px" }}>
-                    <S.MetricRow>
-                      <S.Metric>
-                        <S.MetricLabel>Nota</S.MetricLabel>
-                        <S.MetricValue>
-                          <StarRating rating={review.score} size="sm" showValue />
-                        </S.MetricValue>
-                      </S.Metric>
-                      <S.Metric>
-                        <S.MetricLabel>Data</S.MetricLabel>
-                        <S.MetricValue>{formatReviewDate(review.createdAt)}</S.MetricValue>
-                      </S.Metric>
-                    </S.MetricRow>
+                <S.ReviewList>
+                  {reviewsToRender.map((review) => {
+                    const isOwnReview = currentUser?.username === review.username;
+                    const isEdited = review.updatedAt && review.updatedAt !== review.createdAt;
 
-                    <S.Paragraph style={{ marginTop: "12px" }}>
-                      <strong>{review.username}</strong>
-                    </S.Paragraph>
-                    <S.Paragraph>{review.review?.trim() ? review.review : "Sem comentario."}</S.Paragraph>
-                  </S.DetailCard>
-                ))
+                    return (
+                      <div key={review.id}>
+                        <S.ReviewCard>
+                          <S.ReviewAvatarColumn>
+                            <S.ReviewAvatar>
+                              <User size={34} />
+                            </S.ReviewAvatar>
+                            <S.ReviewUsername>{review.username}</S.ReviewUsername>
+                          </S.ReviewAvatarColumn>
+
+                          <S.ReviewContentColumn>
+                            <S.ReviewTopRow>
+                              <S.ReviewMetaBar>
+                                <S.ReviewScoreValue>{review.score}</S.ReviewScoreValue>
+                                <S.ReviewMetaDivider />
+                                <S.ReviewDate>{formatReviewUpdatedDate(review.createdAt, review.updatedAt)}</S.ReviewDate>
+                                {isEdited ? <S.ReviewMetaChip>editada</S.ReviewMetaChip> : null}
+                              </S.ReviewMetaBar>
+
+                              {isOwnReview ? (
+                                <S.EditReviewButton type="button" onClick={() => setEditingReviewId(review.id)}>
+                                  <PenLine size={16} />
+                                  Editar avaliação
+                                </S.EditReviewButton>
+                              ) : (
+                                <S.ReviewVoteWrap>
+                                  <ReviewVoteControls
+                                    ratingId={review.id}
+                                    upvoteCount={review.upvoteCount}
+                                    downvoteCount={review.downvoteCount}
+                                    userVote={review.userVote ?? null}
+                                    isAuthenticated={Boolean(currentUser)}
+                                    isOwnReview={false}
+                                  />
+                                </S.ReviewVoteWrap>
+                              )}
+                            </S.ReviewTopRow>
+
+                            <S.ReviewText>{review.review?.trim() ? review.review : "Sem comentario."}</S.ReviewText>
+                          </S.ReviewContentColumn>
+                        </S.ReviewCard>
+
+                        {editingReviewId === review.id ? (
+                          <S.ReviewEditForm>
+                            <RatingForm
+                              gameId={game.id}
+                              editMode
+                              ratingId={review.id}
+                              initialScore={review.score}
+                              initialReview={review.review ?? ""}
+                              onSubmitted={() => {
+                                setEditingReviewId(null);
+                                refreshGame();
+                              }}
+                              onCancel={() => setEditingReviewId(null)}
+                            />
+                          </S.ReviewEditForm>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </S.ReviewList>
               )}
             </S.Section>
           </div>

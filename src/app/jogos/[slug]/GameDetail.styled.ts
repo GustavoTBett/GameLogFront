@@ -92,6 +92,57 @@ export const Title = styled.h1`
   letter-spacing: -0.03em;
 `;
 
+export const TitleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: ${fromTheme((theme) => theme.spacing[12])};
+
+  ${fromTheme((theme) => theme.media.mobile)} {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
+export const FavoriteButton = styled.button<{ $active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${fromTheme((theme) => theme.spacing[8])};
+  min-height: 2.75rem;
+  padding: ${fromTheme((theme) => `${theme.spacing[10]} ${theme.spacing[16]}`)};
+  border: 1px solid
+    ${({ theme, $active }) => ($active ? theme.colors.destructive : theme.colors.border)};
+  border-radius: ${fromTheme((theme) => theme.spacing[8])};
+  background: ${({ theme, $active }) => ($active ? `${theme.colors.destructive}14` : theme.colors.card)};
+  color: ${({ theme, $active }) => ($active ? theme.colors.destructive : theme.colors.foreground)};
+  cursor: pointer;
+  font-size: ${fromTheme((theme) => theme.fontSizes[14])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.medium)};
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: ${fromTheme((theme) => theme.colors.destructive)};
+    color: ${fromTheme((theme) => theme.colors.destructive)};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.72;
+  }
+
+  .spin {
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
 export const SubTitle = styled.p`
   margin-top: ${fromTheme((theme) => theme.spacing[8])};
   color: ${fromTheme((theme) => theme.colors.mutedForeground)};
@@ -216,4 +267,164 @@ export const SecondaryMetric = styled(Metric)`
 
 export const ReviewFormWrap = styled.div`
   margin-top: ${fromTheme((theme) => theme.spacing[24])};
+`;
+
+export const ReviewList = styled.div`
+  display: grid;
+  gap: ${fromTheme((theme) => theme.spacing[8])};
+  margin-top: ${fromTheme((theme) => theme.spacing[24])};
+`;
+
+export const ReviewCard = styled.article`
+  display: grid;
+  gap: ${fromTheme((theme) => theme.spacing[16])};
+  padding: ${fromTheme((theme) => theme.spacing[24])} 0;
+  border-bottom: 1px solid ${fromTheme((theme) => theme.colors.border)};
+
+  ${fromTheme((theme) => theme.media.tablet)} {
+    grid-template-columns: minmax(0, 11.5rem) minmax(0, 1fr);
+    gap: ${fromTheme((theme) => theme.spacing[24])};
+  }
+`;
+
+export const ReviewAvatarColumn = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${fromTheme((theme) => theme.spacing[12])};
+
+  ${fromTheme((theme) => theme.media.tablet)} {
+    flex-direction: column;
+    align-items: center;
+    gap: ${fromTheme((theme) => theme.spacing[16])};
+    padding-right: ${fromTheme((theme) => theme.spacing[24])};
+    border-right: 1px solid ${fromTheme((theme) => theme.colors.border)};
+  }
+`;
+
+export const ReviewAvatar = styled.div`
+  width: 5rem;
+  height: 5rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  border: 2px solid ${fromTheme((theme) => theme.colors.border)};
+  background: ${fromTheme((theme) => theme.colors.secondary)};
+  color: ${fromTheme((theme) => theme.colors.mutedForeground)};
+`;
+
+export const ReviewUsername = styled.h3`
+  font-size: ${fromTheme((theme) => theme.fontSizes[20])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.bold)};
+  line-height: ${fromTheme((theme) => theme.lineHeights.tight)};
+
+  ${fromTheme((theme) => theme.media.tablet)} {
+    text-align: center;
+  }
+`;
+
+export const ReviewContentColumn = styled.div`
+  display: grid;
+  gap: ${fromTheme((theme) => theme.spacing[16])};
+  min-width: 0;
+
+  ${fromTheme((theme) => theme.media.tablet)} {
+    padding-left: ${fromTheme((theme) => theme.spacing[4])};
+  }
+`;
+
+export const ReviewTopRow = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: ${fromTheme((theme) => theme.spacing[8])};
+`;
+
+export const ReviewMetaBar = styled.div`
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: ${fromTheme((theme) => theme.spacing[6])};
+  padding: ${fromTheme((theme) => `${theme.spacing[8]} ${theme.spacing[10]}`)};
+  border: 1px solid ${fromTheme((theme) => theme.colors.border)};
+  border-radius: ${fromTheme((theme) => theme.spacing[12])};
+  background: linear-gradient(
+    180deg,
+    ${fromTheme((theme) => theme.colors.secondary)} 0%,
+    ${fromTheme((theme) => theme.colors.background)} 100%
+  );
+  box-shadow: ${fromTheme((theme) => theme.shadows.shadow1)};
+  min-width: fit-content;
+`;
+
+export const ReviewScoreValue = styled.span`
+  font-size: ${fromTheme((theme) => theme.fontSizes[18])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.bold)};
+  line-height: ${fromTheme((theme) => theme.lineHeights.tight)};
+`;
+
+export const ReviewMetaDivider = styled.span`
+  width: 1px;
+  height: 1.25rem;
+  background: ${fromTheme((theme) => theme.colors.border)};
+`;
+
+export const ReviewDate = styled.span`
+  color: ${fromTheme((theme) => theme.colors.mutedForeground)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[12])};
+`;
+
+export const ReviewMetaChip = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: ${fromTheme((theme) => `${theme.spacing[2]} ${theme.spacing[8]}`)};
+  border-radius: 9999px;
+  background: ${fromTheme((theme) => theme.colors.secondary)};
+  color: ${fromTheme((theme) => theme.colors.mutedForeground)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[10])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.medium)};
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+`;
+
+export const ReviewVoteWrap = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+`;
+
+export const EditReviewButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: ${fromTheme((theme) => theme.spacing[4])};
+  padding: ${fromTheme((theme) => `${theme.spacing[6]} ${theme.spacing[10]}`)};
+  border: 0;
+  border-radius: 9999px;
+  background: linear-gradient(
+    180deg,
+    ${fromTheme((theme) => theme.colors.primary)} 0%,
+    ${fromTheme((theme) => theme.colors.primary)} 100%
+  );
+  color: ${fromTheme((theme) => theme.colors.primaryForeground)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[12])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.bold)};
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.16);
+
+  &:hover {
+    filter: brightness(1.04);
+  }
+`;
+
+export const ReviewText = styled.p`
+  color: ${fromTheme((theme) => theme.colors.foreground)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[20])};
+  line-height: ${fromTheme((theme) => theme.lineHeights.tall)};
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 72rem;
+`;
+
+export const ReviewEditForm = styled.div`
+  padding-top: ${fromTheme((theme) => theme.spacing[8])};
 `;

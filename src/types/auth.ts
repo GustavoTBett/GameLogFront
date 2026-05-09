@@ -2,6 +2,8 @@
  * Tipos de autenticação do Gamelog
  */
 
+import type { GamePlatform } from "./game";
+
 export interface LoginRequest {
   identifier: string; // Email ou username
   password: string;
@@ -21,9 +23,20 @@ export interface AuthUserResponse {
   username: string;
   email: string;
   role: "USER" | "ADMIN";
+  avatarUrl?: string | null;
+  bio?: string | null;
+  platforms?: GamePlatform[];
 }
 
 export type User = AuthUserResponse;
+
+export interface UpdateProfileRequest {
+  username: string;
+  email: string;
+  avatarUrl: string | null;
+  bio: string | null;
+  platforms: GamePlatform[];
+}
 
 export interface CsrfToken {
   token: string;

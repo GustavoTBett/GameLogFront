@@ -9,9 +9,11 @@ import {
   ForgotPasswordRequest,
   LoginRequest,
   ResetPasswordRequest,
+  UpdateProfileRequest,
 } from "@/types/auth";
-import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse } from "@/types/game";
-import { CreateRatingRequest, RatingResponse } from "@/types/rating";
+import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse, RecommendationResponse } from "@/types/game";
+import { FavoriteStatusResponse } from "@/types/favorite";
+import { CreateRatingRequest, RatingResponse, RatingVoteRequest } from "@/types/rating";
 import { showErrorToast } from '@/lib/toast';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
@@ -49,6 +51,10 @@ async function fetchCsrfToken(): Promise<CsrfToken> {
 /**
  * Cliente HTTP wrapper que adiciona CSRF token e headers automáticos
  */
+function hasMessage(value: unknown): value is { message?: unknown } {
+  return typeof value === "object" && value !== null && "message" in value;
+}
+
 async function fetchAPI<T = unknown>(
   endpoint: string,
   options: RequestInit = {}
@@ -91,18 +97,29 @@ async function fetchAPI<T = unknown>(
 
     // Tratamento de erros
     if (!response.ok) {
-      const error: ApiRequestError<T> = new Error("Erro na requisição");
+      const maybeMessage = hasMessage(data) ? data.message : undefined;
+      const fallbackMessage =
+        response.status === 400
+          ? "Não foi possível gerar a recomendação"
+          : response.status === 401
+            ? "Sua sessão expirou. Faça login novamente."
+            : "Erro na requisição";
+
+      const error: ApiRequestError<T> = new Error(
+        maybeMessage ? String(maybeMessage) : fallbackMessage
+      );
       error.status = response.status;
       error.data = data;
 
       // Mostrar mensagem do backend se existir
       try {
-        const maybeMessage = (data as any)?.message;
         if (maybeMessage) showErrorToast(String(maybeMessage));
-      } catch (_) {}
+      } catch {
+      }
 
-      // Se for 401, usuário não autenticado - logout automático
-      if (response.status === 401) {
+      // Se for 401 em chamadas protegidas, disparar logout automático.
+      // A checagem inicial de /auth/me é silenciosa para não poluir a UI ao abrir o app deslogado.
+      if (response.status === 401 && !endpoint.startsWith("/auth/me")) {
         // Disparar evento para logout automático (será tratado no contexto)
         window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }
@@ -117,7 +134,8 @@ async function fetchAPI<T = unknown>(
       const errorMessage = `Erro de conexão: ${error.message}`;
       try {
         showErrorToast(errorMessage);
-      } catch (_) {}
+      } catch {
+      }
       throw new Error(errorMessage);
     }
     throw error;
@@ -128,6 +146,8 @@ async function fetchAPI<T = unknown>(
  * Endpoints de autenticação
  */
 export const authAPI = {
+  googleLoginUrl: (): string => `${API_BASE_URL}/oauth2/authorization/google`,
+
   /**
    * Fazer login
    */
@@ -202,6 +222,52 @@ export const authAPI = {
   },
 };
 
+export const usersAPI = {
+  getProfile: async (): Promise<AuthUserResponse> => {
+    const { data } = await fetchAPI<AuthUserResponse>("/users/me", {
+      method: "GET",
+    });
+    return data;
+  },
+
+  updateProfile: async (payload: UpdateProfileRequest): Promise<AuthUserResponse> => {
+    const { data } = await fetchAPI<AuthUserResponse>("/users/me", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+    return data;
+  },
+};
+
+export const favoritesAPI = {
+  getMine: async (): Promise<GameSummary[]> => {
+    const { data } = await fetchAPI<GameSummary[]>("/favorites/me", {
+      method: "GET",
+    });
+    return data;
+  },
+
+  getStatus: async (gameId: number): Promise<FavoriteStatusResponse> => {
+    const { data } = await fetchAPI<FavoriteStatusResponse>(`/favorites/games/${gameId}`, {
+      method: "GET",
+    });
+    return data;
+  },
+
+  favorite: async (gameId: number): Promise<FavoriteStatusResponse> => {
+    const { data } = await fetchAPI<FavoriteStatusResponse>(`/favorites/games/${gameId}`, {
+      method: "POST",
+    });
+    return data;
+  },
+
+  unfavorite: async (gameId: number): Promise<void> => {
+    await fetchAPI<void>(`/favorites/games/${gameId}`, {
+      method: "DELETE",
+    });
+  },
+};
+
 export const gamesAPI = {
   explore: async (
     params: ExploreGamesFilters & { page?: number; size?: number }
@@ -221,6 +287,10 @@ export const gamesAPI = {
 
     if (typeof params.minRating === "number") {
       searchParams.set("minRating", String(params.minRating));
+    }
+
+    if (typeof (params as { q?: string }).q === "string" && (params as { q?: string }).q?.trim()) {
+      searchParams.set("q", (params as { q?: string }).q!.trim());
     }
 
     const { data } = await fetchAPI<PagedResponse<GameSummary>>(`/games/explore?${searchParams.toString()}`);
@@ -265,6 +335,26 @@ export const ratingsAPI = {
       body: JSON.stringify(payload),
     });
 
+    return data;
+  },
+  vote: async (ratingId: number, payload: RatingVoteRequest): Promise<void> => {
+    await fetchAPI<void>(`/ratings/${ratingId}/vote`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  removeVote: async (ratingId: number): Promise<void> => {
+    await fetchAPI<void>(`/ratings/${ratingId}/vote`, {
+      method: "DELETE",
+    });
+  },
+};
+
+export const recommendationsAPI = {
+  generateOne: async (): Promise<RecommendationResponse> => {
+    const { data } = await fetchAPI<RecommendationResponse>("/recommendations/generate", {
+      method: "POST",
+    });
     return data;
   },
 };

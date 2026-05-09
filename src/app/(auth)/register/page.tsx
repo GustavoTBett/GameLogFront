@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Gamepad2, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { LogIn, Gamepad2, Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { authAPI } from "@/lib/api";
 import * as S from "@/components/auth/AuthLayout.styled";
 
@@ -111,6 +111,15 @@ export default function RegisterPage() {
           </S.CardHeader>
 
           <S.CardContent>
+            <S.OAuthForm action={authAPI.googleLoginUrl()} method="GET">
+              <S.OAuthButton type="submit" disabled={isLoading} formNoValidate>
+                <LogIn size={18} />
+                Cadastrar com Google
+              </S.OAuthButton>
+            </S.OAuthForm>
+
+            <S.OAuthDivider>ou</S.OAuthDivider>
+
             <S.FormContainer onSubmit={handleSubmit}>
               {submitError && <S.SubmitError>{submitError}</S.SubmitError>}
 
