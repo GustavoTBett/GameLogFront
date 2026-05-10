@@ -13,6 +13,7 @@ interface AuthProviderProps {
 type ApiErrorData = { message?: string };
 
 type ApiError = Error & {
+  status?: number;
   data?: ApiErrorData;
 };
 
@@ -55,8 +56,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null);
     } catch (err: unknown) {
       // Se houver erro (401, etc), limpar dados locais
+      const apiError = err as ApiError;
       setUser(null);
       localStorage.removeItem("auth_user");
+
+      if (apiError.status === 401) {
+        setError(null);
+        return;
+      }
+
       setError(getErrorMessage(err, "Erro ao verificar autenticação"));
     } finally {
       setIsLoading(false);

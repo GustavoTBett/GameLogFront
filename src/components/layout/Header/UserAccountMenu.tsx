@@ -4,7 +4,6 @@ import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { User, Heart, Sparkles, LogOut } from "lucide-react"
-import { DefaultTheme } from "styled-components"
 import * as S from "./Header.styled"
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle"
 import {
@@ -14,11 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown/DropdownMenu"
-
-const fromTheme = <T,>(selector: (theme: DefaultTheme) => T) =>
-  ({ theme }: { theme: DefaultTheme }) => selector(theme)
-
-/* local LogoutButton replaced by DropdownMenuItem variant="destructive" */
 
 export function UserAccountMenu() {
   const router = useRouter()

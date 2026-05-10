@@ -41,6 +41,10 @@ export default function GamesPage() {
   const filters = useMemo<ExploreGamesFilters>(() => {
     const value: ExploreGamesFilters = {};
 
+    if (searchQuery) {
+      value.q = searchQuery;
+    }
+
     if (genreId) {
       value.genreId = Number(genreId);
     }
@@ -54,7 +58,7 @@ export default function GamesPage() {
     }
 
     return value;
-  }, [genreId, minRating, platform]);
+  }, [genreId, minRating, platform, searchQuery]);
 
   const { games, meta, isLoading, error } = useExploreGames({
     page: effectivePage,
@@ -62,26 +66,7 @@ export default function GamesPage() {
     filters,
   });
 
-  const filteredGames = useMemo(() => {
-    if (!searchQuery) {
-      return games;
-    }
-
-    const normalizedQuery = searchQuery.toLowerCase();
-
-    return games.filter((game) => {
-      const searchableText = [
-        game.name,
-        game.description ?? "",
-        game.developer ?? "",
-        game.genres.join(" "),
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      return searchableText.includes(normalizedQuery);
-    });
-  }, [games, searchQuery]);
+  const filteredGames = games;
 
   useEffect(() => {
     let isCancelled = false;
@@ -234,7 +219,7 @@ export default function GamesPage() {
               </S.Pagination>
               {searchQuery ? (
                 <S.SectionSubtitle>
-                  A paginação foi fixada na primeira página enquanto a busca por texto estiver ativa.
+                  Resultados filtrados no servidor para &quot;{searchQuery}&quot;.
                 </S.SectionSubtitle>
               ) : null}
             </>

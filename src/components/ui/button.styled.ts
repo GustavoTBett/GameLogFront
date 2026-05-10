@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import type { DefaultTheme } from "styled-components";
 
 interface ButtonProps {
@@ -37,39 +37,39 @@ const sizeStyles = {
 };
 
 const variantStyles = {
-  primary: `
-    background-color: ${(props: ThemeProps) => props.theme.colors.primary};
-    color: white;
+  primary: css`
+    background-color: ${({ theme }: ThemeProps) => theme.colors.primary};
+    color: ${({ theme }: ThemeProps) => theme.colors.primaryForeground};
     border: 1px solid transparent;
-    
+
     &:hover:not(:disabled) {
-      background-color: ${(props: ThemeProps) => props.theme.colors.primary}DD;
+      background-color: ${({ theme }: ThemeProps) => theme.colors.primary}DD;
       opacity: 0.9;
     }
   `,
-  ghost: `
+  ghost: css`
     background-color: transparent;
-    color: ${(props: ThemeProps) => props.theme.colors.foreground};
+    color: ${({ theme }: ThemeProps) => theme.colors.foreground};
     border: 1px solid transparent;
-    
+
     &:hover:not(:disabled) {
-      background-color: ${(props: ThemeProps) => props.theme.colors.secondary};
+      background-color: ${({ theme }: ThemeProps) => theme.colors.secondary};
     }
   `,
-  outline: `
+  outline: css`
     background-color: transparent;
-    color: ${(props: ThemeProps) => props.theme.colors.foreground};
-    border: 1px solid ${(props: ThemeProps) => props.theme.colors.border};
-    
+    color: ${({ theme }: ThemeProps) => theme.colors.foreground};
+    border: 1px solid ${({ theme }: ThemeProps) => theme.colors.border};
+
     &:hover:not(:disabled) {
-      background-color: ${(props: ThemeProps) => props.theme.colors.secondary};
+      background-color: ${({ theme }: ThemeProps) => theme.colors.secondary};
     }
   `,
-  destructive: `
-    background-color: ${(props: ThemeProps) => props.theme.colors.destructive};
-    color: white;
+  destructive: css`
+    background-color: ${({ theme }: ThemeProps) => theme.colors.destructive};
+    color: ${({ theme }: ThemeProps) => theme.colors.destructiveForeground};
     border: 1px solid transparent;
-    
+
     &:hover:not(:disabled) {
       opacity: 0.9;
     }

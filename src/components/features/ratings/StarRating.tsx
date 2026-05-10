@@ -8,13 +8,14 @@ import { Button as UIButton } from '@/components/ui/button/Button'
 interface StarRatingProps {
   rating: number;
   maxRating?: number;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   interactive?: boolean;
   onRatingChange?: (rating: number) => void;
   showValue?: boolean;
 }
 
 const sizes = {
+  xs: 14,
   sm: 16,
   md: 20,
   lg: 28,
@@ -28,10 +29,11 @@ const Wrapper = styled.div<{ $gap: string }>`
 
 /* Use shared UI Button for icon buttons to keep focus/hover consistent */
 
-const Value = styled.span<{ $size: "sm" | "md" | "lg" }>`
+const Value = styled.span<{ $size: "xs" | "sm" | "md" | "lg" }>`
   margin-left: 0.5rem;
   font-weight: 700;
   font-size: ${({ $size, theme }) => {
+    if ($size === "xs") return theme.fontSizes[10];
     if ($size === "sm") return theme.fontSizes[12];
     if ($size === "md") return theme.fontSizes[14];
     return theme.fontSizes[16];
@@ -48,7 +50,7 @@ export function StarRating({
   showValue = false,
 }: StarRatingProps) {
   const iconSize = sizes[size];
-  const gap = size === "sm" ? "0.125rem" : size === "lg" ? "0.375rem" : "0.25rem";
+  const gap = size === "xs" ? "0.1rem" : size === "sm" ? "0.125rem" : size === "lg" ? "0.375rem" : "0.25rem";
 
   const handleSelect = (index: number) => {
     if (interactive && onRatingChange) {

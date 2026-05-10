@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styled from "styled-components";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -163,10 +164,11 @@ export function GameCard({ game, href }: GameCardProps) {
         <StyledCard>
         <Cover className="game-card-cover">
           {!imageError && game.coverUrl ? (
-            <img
+            <Image
               src={game.coverUrl}
               alt={`Capa de ${game.name}`}
-              loading="lazy"
+              fill
+              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
               onError={() => setImageError(true)}
             />
           ) : (

@@ -15,7 +15,7 @@ O frontend entrega a interface para:
 - navegar pela home com destaques, populares e top rated;
 - explorar jogos com filtros e paginação;
 - visualizar detalhes de jogos por slug;
-- autenticar usuários;
+- autenticar usuários com senha ou Google;
 - registrar novos usuários;
 - solicitar e redefinir senha;
 - alternar tema claro/escuro;
@@ -40,7 +40,7 @@ O app usa App Router em `src/app` e os principais arquivos são:
 - `src/app/HomeClient.tsx` para a interface principal da home
 - `src/app/jogos/page.tsx` para a listagem de jogos
 - `src/app/jogos/[slug]/` para a página de detalhe do jogo
-- `src/app/(auth)/login`, `register`, `forgot-password` e `reset-password` para autenticação
+- `src/app/login`, `src/app/(auth)/register`, `forgot-password` e `reset-password` para autenticação
 
 ## Componentes e hooks relevantes
 
@@ -73,6 +73,8 @@ O frontend consome a API do backend via `src/lib/api.ts`.
 - `/register` - cadastro
 - `/forgot-password` - solicitação de redefinição de senha
 - `/reset-password` - criação de nova senha
+
+O botão de Google nas telas de login e cadastro redireciona para `/oauth2/authorization/google` no backend. Depois do callback, o backend devolve o usuário para a URL base do frontend e o app sincroniza a sessão via `GET /auth/me`.
 
 ### Observação de navegação
 
@@ -111,6 +113,8 @@ Crie um `.env.local` com, no mínimo, a URL da API quando ela não estiver no pa
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 ```
+
+O frontend não precisa de client ID do Google. As credenciais OAuth ficam no backend em `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`.
 
 ## Layout visual e estado de sessão
 

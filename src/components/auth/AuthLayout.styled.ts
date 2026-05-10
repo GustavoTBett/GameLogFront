@@ -106,6 +106,61 @@ export const CardContent = styled.div`
   padding: ${(props) => props.theme.spacing[24]};
 `;
 
+export const OAuthForm = styled.form`
+  width: 100%;
+`;
+
+export const OAuthButton = styled.button`
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${(props) => props.theme.spacing[8]};
+  padding: ${(props) => props.theme.spacing[10]} ${(props) => props.theme.spacing[16]};
+  border: 1px solid ${(props) => props.theme.colors.border};
+  border-radius: 0.375rem;
+  background-color: ${(props) => props.theme.colors.card};
+  color: ${(props) => props.theme.colors.foreground};
+  font-size: ${(props) => props.theme.fontSizes[14]};
+  font-weight: ${(props) => props.theme.fontWeights.medium};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: ${(props) => props.theme.colors.primary};
+    background-color: ${(props) => props.theme.colors.secondary};
+  }
+`;
+
+export const OAuthDivider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${(props) => props.theme.spacing[12]};
+  margin: ${(props) => props.theme.spacing[16]} 0;
+  color: ${(props) => props.theme.colors.mutedForeground};
+  font-size: ${(props) => props.theme.fontSizes[12]};
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: ${(props) => props.theme.colors.border};
+  }
+`;
+
 export const FormContainer = styled.form`
   display: flex;
   flex-direction: column;

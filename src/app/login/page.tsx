@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Gamepad2, Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { LogIn, Gamepad2, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { authAPI } from "@/lib/api";
 import * as S from "@/components/auth/AuthLayout.styled";
 
 type LoginRequestError = {
@@ -16,6 +17,7 @@ type LoginRequestError = {
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isLoading } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +26,11 @@ export default function LoginPage() {
     password: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitError, setSubmitError] = useState<string>("");
+  const [submitError, setSubmitError] = useState<string>(
+    searchParams.get("oauth") === "google-error"
+      ? "Não foi possível entrar com Google. Tente novamente."
+      : ""
+  );
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -35,7 +41,6 @@ export default function LoginPage() {
       !formData.identifier.includes("@") &&
       formData.identifier.length < 3
     ) {
-      // Se parecer ser email (com @) ou username (mín 3 chars)
       newErrors.identifier = "Email ou usuário inválido";
     }
 
@@ -59,7 +64,6 @@ export default function LoginPage() {
     } catch (error: unknown) {
       const requestError = error as LoginRequestError;
 
-      // Erro já foi tratado pelo contexto, mas exibir mensagem específica
       if (requestError.status === 401) {
         setSubmitError("Email/usuário ou senha incorretos");
       } else {
@@ -98,6 +102,15 @@ export default function LoginPage() {
           </S.CardHeader>
 
           <S.CardContent>
+            <S.OAuthForm action={authAPI.googleLoginUrl()} method="GET">
+              <S.OAuthButton type="submit" disabled={isLoading} formNoValidate>
+                <LogIn size={18} />
+                Continuar com Google
+              </S.OAuthButton>
+            </S.OAuthForm>
+
+            <S.OAuthDivider>ou</S.OAuthDivider>
+
             <S.FormContainer onSubmit={handleSubmit}>
               {submitError && <S.SubmitError>{submitError}</S.SubmitError>}
 
