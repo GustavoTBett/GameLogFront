@@ -101,6 +101,8 @@ async function fetchAPI<T = unknown>(
       const fallbackMessage =
         response.status === 400
           ? "Não foi possível gerar a recomendação"
+          : response.status === 503
+            ? "Serviço de recomendação temporariamente indisponível. Tente novamente em instantes."
           : response.status === 401
             ? "Sua sessão expirou. Faça login novamente."
             : "Erro na requisição";
