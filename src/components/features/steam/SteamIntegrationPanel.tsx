@@ -230,7 +230,7 @@ export function SteamIntegrationPanel({ compact = false, showReviews = false, cl
                           </MetaBadge>
                           <MetaBadge>
                             <Clock3 size={12} />
-                            {formatDateTime(review.reviewedAt ?? review.importedAt)}
+                            {review.reviewedAt ? formatDateTime(review.reviewedAt) : "Data indisponivel"}
                           </MetaBadge>
                           {review.language ? <MetaBadge>{review.language}</MetaBadge> : null}
                         </ReviewMeta>
