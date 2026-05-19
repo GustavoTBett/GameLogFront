@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname, useRouter } from "next/navigation"
-import { Heart, User, LogOut } from "lucide-react"
+import { Heart, User, LogOut, Gamepad2 } from "lucide-react"
 import * as S from "./Header.styled"
 import { useAuth } from "@/hooks/useAuth"
 import styled, { type DefaultTheme } from "styled-components"
@@ -78,6 +78,12 @@ export function NavLinks({ isMobile, onClose }: NavLinksProps) {
           {link.label}
         </S.NavItem>
       ))}
+
+      {isAuthenticated ? (
+        <S.NavItem href="/steam" $isActive={isActive("/steam")} $isMobile={isMobile} onClick={onClose}>
+          <Gamepad2 size={18} /> Steam
+        </S.NavItem>
+      ) : null}
 
       {isMobile && isAuthenticated && (
         <>

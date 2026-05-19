@@ -388,6 +388,32 @@ export const ReviewMetaChip = styled.span`
   letter-spacing: 0.04em;
 `;
 
+export const ReviewSourceChip = styled.span`
+  display: inline-flex;
+  align-items: center;
+  padding: ${fromTheme((theme) => `${theme.spacing[2]} ${theme.spacing[8]}`)};
+  border-radius: 9999px;
+  background: ${fromTheme((theme) => theme.colors.foreground)};
+  color: ${fromTheme((theme) => theme.colors.background)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[10])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.bold)};
+  text-transform: uppercase;
+  letter-spacing: 0;
+`;
+
+export const SteamRecommendationChip = styled.span<{ $recommended: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: ${fromTheme((theme) => theme.spacing[4])};
+  padding: ${fromTheme((theme) => `${theme.spacing[2]} ${theme.spacing[8]}`)};
+  border-radius: 9999px;
+  background: ${({ theme, $recommended }) => ($recommended ? `${theme.colors.primary}1A` : `${theme.colors.destructive}1A`)};
+  color: ${({ theme, $recommended }) => ($recommended ? theme.colors.primary : theme.colors.destructive)};
+  font-size: ${fromTheme((theme) => theme.fontSizes[10])};
+  font-weight: ${fromTheme((theme) => theme.fontWeights.medium)};
+  letter-spacing: 0;
+`;
+
 export const ReviewVoteWrap = styled.div`
   display: flex;
   justify-content: flex-end;

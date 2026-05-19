@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Gamepad2, Heart, Loader2, PenLine, Star, User } from "lucide-react";
+import { ArrowLeft, Gamepad2, Heart, Loader2, PenLine, Star, ThumbsDown, ThumbsUp, User } from "lucide-react";
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
 import { RatingForm } from "@/components/features/ratings/RatingForm";
@@ -19,7 +19,11 @@ function formatDate(date: string | null): string {
   return new Date(`${date}T00:00:00`).toLocaleDateString("pt-BR");
 }
 
-function formatReviewDate(value: string): string {
+function formatReviewDate(value: string | null): string {
+  if (!value) {
+    return "Data indisponivel";
+  }
+
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
     return "Data indisponivel";
@@ -32,12 +36,16 @@ function formatReviewDate(value: string): string {
   });
 }
 
-function formatReviewUpdatedDate(createdAt: string, updatedAt?: string | null): string {
+function formatReviewUpdatedDate(createdAt: string | null, updatedAt?: string | null): string {
   if (!updatedAt || updatedAt === createdAt) {
     return formatReviewDate(createdAt);
   }
 
   return formatReviewDate(updatedAt);
+}
+
+function reviewKey(review: { source: string; id: number }): string {
+  return `${review.source}-${review.id}`;
 }
 
 export default function GameDetailPage() {
@@ -58,7 +66,7 @@ export default function GameDetailPage() {
       return null;
     }
 
-    return game.reviews.find((review) => review.username === currentUser.username) ?? null;
+    return game.reviews.find((review) => review.source === "APP" && review.canEdit) ?? null;
   }, [currentUser, game]);
 
   const reviewsToRender = useMemo(() => {
@@ -70,7 +78,7 @@ export default function GameDetailPage() {
       return game.reviews;
     }
 
-    return [currentUserReview, ...game.reviews.filter((review) => review.id !== currentUserReview.id)];
+    return [currentUserReview, ...game.reviews.filter((review) => reviewKey(review) !== reviewKey(currentUserReview))];
   }, [currentUserReview, game]);
 
   const loadGame = async (currentSlug: string, isCancelledRef: { current: boolean }) => {
@@ -242,7 +250,8 @@ export default function GameDetailPage() {
               <S.ChipRow>
                 <S.Chip>{formatDate(game.releaseDate)}</S.Chip>
                 <S.Chip>{game.developer ?? "Desenvolvedor nao informado"}</S.Chip>
-                <S.Chip>{game.totalReviews} avaliacoes</S.Chip>
+                <S.Chip>{game.appReviewCount} avaliacoes Gamelog</S.Chip>
+                <S.Chip>{game.steamReviewCount} reviews Steam</S.Chip>
               </S.ChipRow>
 
               <S.MetricRowThree>
@@ -330,11 +339,15 @@ export default function GameDetailPage() {
               ) : (
                 <S.ReviewList>
                   {reviewsToRender.map((review) => {
-                    const isOwnReview = currentUser?.username === review.username;
-                    const isEdited = review.updatedAt && review.updatedAt !== review.createdAt;
+                    const isAppReview = review.source === "APP";
+                    const isSteamReview = review.source === "STEAM";
+                    const isOwnReview = isAppReview && review.canEdit;
+                    const canVote = isAppReview && review.canVote;
+                    const isEdited = isAppReview && review.updatedAt && review.updatedAt !== review.createdAt;
+                    const isRecommended = review.recommended === true;
 
                     return (
-                      <div key={review.id}>
+                      <div key={reviewKey(review)}>
                         <S.ReviewCard>
                           <S.ReviewAvatarColumn>
                             <S.ReviewAvatar>
@@ -346,8 +359,21 @@ export default function GameDetailPage() {
                           <S.ReviewContentColumn>
                             <S.ReviewTopRow>
                               <S.ReviewMetaBar>
-                                <S.ReviewScoreValue>{review.score}</S.ReviewScoreValue>
+                                {isAppReview ? (
+                                  <S.ReviewScoreValue>{review.score ?? "-"}</S.ReviewScoreValue>
+                                ) : (
+                                  <S.ReviewSourceChip>Steam</S.ReviewSourceChip>
+                                )}
                                 <S.ReviewMetaDivider />
+                                {isSteamReview ? (
+                                  <>
+                                    <S.SteamRecommendationChip $recommended={isRecommended}>
+                                      {isRecommended ? <ThumbsUp size={12} /> : <ThumbsDown size={12} />}
+                                      {isRecommended ? "Recomendada" : "Nao recomendada"}
+                                    </S.SteamRecommendationChip>
+                                    <S.ReviewMetaDivider />
+                                  </>
+                                ) : null}
                                 <S.ReviewDate>{formatReviewUpdatedDate(review.createdAt, review.updatedAt)}</S.ReviewDate>
                                 {isEdited ? <S.ReviewMetaChip>editada</S.ReviewMetaChip> : null}
                               </S.ReviewMetaBar>
@@ -357,7 +383,7 @@ export default function GameDetailPage() {
                                   <PenLine size={16} />
                                   Editar avaliação
                                 </S.EditReviewButton>
-                              ) : (
+                              ) : canVote ? (
                                 <S.ReviewVoteWrap>
                                   <ReviewVoteControls
                                     ratingId={review.id}
@@ -368,20 +394,20 @@ export default function GameDetailPage() {
                                     isOwnReview={false}
                                   />
                                 </S.ReviewVoteWrap>
-                              )}
+                              ) : null}
                             </S.ReviewTopRow>
 
                             <S.ReviewText>{review.review?.trim() ? review.review : "Sem comentario."}</S.ReviewText>
                           </S.ReviewContentColumn>
                         </S.ReviewCard>
 
-                        {editingReviewId === review.id ? (
+                        {isOwnReview && editingReviewId === review.id ? (
                           <S.ReviewEditForm>
                             <RatingForm
                               gameId={game.id}
                               editMode
                               ratingId={review.id}
-                              initialScore={review.score}
+                              initialScore={review.score ?? 0}
                               initialReview={review.review ?? ""}
                               onSubmitted={() => {
                                 setEditingReviewId(null);

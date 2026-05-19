@@ -14,6 +14,7 @@ import {
 import { ExploreGamesFilters, GameDetail, GameSummary, GenreOption, PagedResponse, RecommendationResponse } from "@/types/game";
 import { FavoriteStatusResponse } from "@/types/favorite";
 import { CreateRatingRequest, RatingResponse, RatingVoteRequest } from "@/types/rating";
+import { SteamAccountResponse, SteamSyncSummaryResponse, SteamUserReviewResponse } from "@/types/steam";
 import { showErrorToast } from '@/lib/toast';
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
@@ -220,6 +221,34 @@ export const authAPI = {
     });
 
     csrfTokenCache = null;
+    return data;
+  },
+};
+
+export const steamAPI = {
+  connectUrl: (): string => `${API_BASE_URL}/auth/steam`,
+
+  getMyAccount: async (): Promise<SteamAccountResponse> => {
+    const { data } = await fetchAPI<SteamAccountResponse>("/steam/me", {
+      method: "GET",
+    });
+
+    return data;
+  },
+
+  getMyReviews: async (): Promise<SteamUserReviewResponse[]> => {
+    const { data } = await fetchAPI<SteamUserReviewResponse[]>("/steam/me/reviews", {
+      method: "GET",
+    });
+
+    return data;
+  },
+
+  syncMyAccount: async (): Promise<SteamSyncSummaryResponse> => {
+    const { data } = await fetchAPI<SteamSyncSummaryResponse>("/steam/me/sync", {
+      method: "POST",
+    });
+
     return data;
   },
 };

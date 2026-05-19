@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
-import { User, Heart, Sparkles, LogOut } from "lucide-react"
+import { User, Heart, Sparkles, LogOut, Gamepad2 } from "lucide-react"
 import * as S from "./Header.styled"
 import { ThemeToggle } from "@/components/ui/theme-toggle/ThemeToggle"
 import {
@@ -61,6 +61,9 @@ export function UserAccountMenu() {
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <S.MenuLink href="/favoritos"><Heart size={16} /> Favoritos</S.MenuLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <S.MenuLink href="/steam"><Gamepad2 size={16} /> Steam</S.MenuLink>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <S.MenuLink href="/recomendacoes"><Sparkles size={16} /> Recomendações</S.MenuLink>

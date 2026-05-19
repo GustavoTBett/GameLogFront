@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { Footer } from "@/components/layout/Footer/Footer";
 import { Header } from "@/components/layout/Header/Header";
+import { SteamIntegrationPanel } from "@/components/features/steam/SteamIntegrationPanel";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -466,6 +467,8 @@ function ProfileContent() {
                 ))}
               </S.SelectedPlatforms>
             ) : null}
+
+            <SteamIntegrationPanel compact />
           </S.SidePanel>
         </S.ProfileGrid>
       </S.Container>

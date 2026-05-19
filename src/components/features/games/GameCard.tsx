@@ -191,7 +191,8 @@ export function GameCard({ game, href }: GameCardProps) {
 
           <MetaRow>
             <span>{formatReleaseDate(game.releaseDate)}</span>
-            <span>{game.totalReviews} avaliações</span>
+            <span>{game.appReviewCount} avaliações</span>
+            <span>{game.steamReviewCount} Steam</span>
           </MetaRow>
 
           <MetaRow style={{ marginTop: "8px" }}>

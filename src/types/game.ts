@@ -20,20 +20,28 @@ export interface GameSummary {
   releaseDate: string | null;
   developer: string | null;
   totalReviews: number;
+  appReviewCount: number;
+  steamReviewCount: number;
   genres: string[];
   platforms: GamePlatform[];
 }
 
+export type GameReviewSource = "APP" | "STEAM";
+
 export interface GameReview {
   id: number;
-  score: number;
+  score: number | null;
   review: string | null;
   username: string;
-  createdAt: string;
+  createdAt: string | null;
   updatedAt?: string | null;
   upvoteCount: number;
   downvoteCount: number;
   userVote?: "UPVOTE" | "DOWNVOTE" | null;
+  source: GameReviewSource;
+  recommended: boolean | null;
+  canEdit: boolean;
+  canVote: boolean;
 }
 
 export interface GameDetail extends GameSummary {
