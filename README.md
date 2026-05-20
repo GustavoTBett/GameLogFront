@@ -62,6 +62,38 @@ O frontend consome a API do backend via `src/lib/api.ts`.
 - o token CSRF é obtido em `GET /auth/csrf`
 - o cliente chama `authAPI`, `gamesAPI` e `genresAPI`
 
+### Safari e cookies de sessão em produção
+
+Quando o frontend fica em `https://game-log-front.vercel.app` e a API em
+`https://api-gamelog-back.gustavotbett.com.br`, o Safari pode bloquear o cookie
+de sessão como cookie de terceiro. Nesse caso, `GET /auth/me` chega ao backend
+sem o cookie `GAMELOG_SESSION`, mesmo com `credentials: include`.
+
+Para evitar isso sem trocar o domínio do frontend, use o proxy same-origin do
+Next/Vercel:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=/api/backend
+API_PROXY_TARGET=https://api-gamelog-back.gustavotbett.com.br
+```
+
+Com isso o navegador chama `https://game-log-front.vercel.app/api/backend/...`,
+e o Next reescreve a chamada para a API real.
+
+Se usar Google OAuth por esse proxy, configure também no backend:
+
+```bash
+APP_FRONTEND_BASE_URL=https://game-log-front.vercel.app
+APP_SECURITY_ALLOWED_ORIGINS=https://game-log-front.vercel.app
+SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_REDIRECT_URI=https://game-log-front.vercel.app/api/backend/login/oauth2/code/google
+```
+
+Adicione essa mesma URL de callback nos URIs autorizados do cliente OAuth do
+Google. A alternativa mais simples, quando possível, é publicar o frontend em
+um subdomínio do mesmo site da API, por exemplo
+`https://gamelog.gustavotbett.com.br`, mantendo a API em
+`https://api-gamelog-back.gustavotbett.com.br`.
+
 ## Rotas e fluxo atual
 
 ### Páginas implementadas
@@ -112,6 +144,14 @@ Crie um `.env.local` com, no mínimo, a URL da API quando ela não estiver no pa
 
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
+```
+
+Em produção no Vercel, prefira o caminho proxied para evitar bloqueio de cookie
+no Safari:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=/api/backend
+API_PROXY_TARGET=https://api-gamelog-back.gustavotbett.com.br
 ```
 
 O frontend não precisa de client ID do Google. As credenciais OAuth ficam no backend em `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`.
